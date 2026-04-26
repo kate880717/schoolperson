@@ -9,67 +9,109 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        *,*::before,*::after{box-sizing:border-box;}
+        html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;}
+        body{font-family:'Jua',sans-serif;background:#f0fdf4;touch-action:manipulation;}
+        #root{width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-        body {
-            font-family: 'Jua', sans-serif;
-            background-color: #f0fdf4;
-            touch-action: manipulation;
-        }
+        /* vmin 기반 다이나믹 컴포넌트 */
+        .v-screen{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3vmin;overflow:hidden;position:relative;}
+        .v-card{background:white;border-radius:3vmin;padding:4vmin;width:100%;max-width:80vmin;box-shadow:0 4px 40px rgba(0,0,0,0.12);border:0.5vmin solid #d1fae5;}
+        .v-h1{font-size:5.5vmin;font-weight:900;line-height:1.2;}
+        .v-h2{font-size:4.5vmin;font-weight:800;line-height:1.2;}
+        .v-h3{font-size:3.5vmin;font-weight:700;line-height:1.3;}
+        .v-body{font-size:2.8vmin;line-height:1.5;}
+        .v-btn{width:100%;padding:2.5vmin 4vmin;font-size:4vmin;font-weight:700;border-radius:2vmin;border:none;cursor:pointer;transition:transform 0.1s,opacity 0.2s;font-family:'Jua',sans-serif;}
+        .v-btn:active{transform:scale(0.97);}
+        .v-btn-green{background:#22c55e;color:white;}
+        .v-btn-green:hover{background:#16a34a;}
+        .v-btn-yellow{background:#facc15;color:white;}
+        .v-btn-yellow:hover{background:#eab308;}
+        .v-btn-gray{background:#f3f4f6;color:#6b7280;}
+        .v-select{width:100%;padding:2vmin;font-size:3.5vmin;font-weight:700;border:0.4vmin solid #bbf7d0;border-radius:1.5vmin;background:#f0fdf4;color:#15803d;font-family:'Jua',sans-serif;outline:none;margin-bottom:2vmin;}
+        .v-select:focus{border-color:#22c55e;}
+        .v-mic{width:16vmin;height:16vmin;border-radius:50%;display:flex;align-items:center;justify-content:center;border:0.6vmin solid;font-size:6vmin;cursor:pointer;transition:transform 0.1s;margin:0 auto;}
+        .v-mic:active{transform:scale(0.95);}
+        .v-top-bar{position:absolute;top:2vmin;right:2vmin;z-index:50;}
+        .v-top-btn{padding:1.5vmin;border-radius:50%;border:none;cursor:pointer;font-size:3.5vmin;line-height:1;}
+        .v-progress{height:1.5vmin;border-radius:99px;background:#e5e7eb;overflow:hidden;width:100%;}
+        .v-progress-fill{height:100%;background:#22c55e;transition:width 0.4s ease;}
+        .v-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2vmin;width:100%;}
+        .v-place-btn{padding:2.5vmin;border-radius:2vmin;border:0.4vmin solid #bbf7d0;background:white;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1vmin;font-family:'Jua',sans-serif;font-size:2.5vmin;font-weight:700;transition:all 0.15s;}
+        .v-place-btn:active{transform:scale(0.95);}
+        .v-place-btn.done{background:#f9fafb;border-color:#e5e7eb;color:#9ca3af;}
+        .v-place-emoji{font-size:5vmin;}
+        .v-bottom-sheet{position:absolute;bottom:0;left:0;right:0;background:white;border-radius:3vmin 3vmin 0 0;padding:4vmin;box-shadow:0 -4px 30px rgba(0,0,0,0.15);border-top:0.5vmin solid #d1fae5;}
+        .v-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:60;padding:4vmin;}
+        .v-popup{background:white;border-radius:3vmin;padding:5vmin;width:100%;max-width:70vmin;text-align:center;}
+        .v-star{font-size:7vmin;cursor:pointer;transition:transform 0.1s;}
+        .v-star:active{transform:scale(0.9);}
+        .v-txt-area{width:100%;height:10vmin;padding:2vmin;border:0.4vmin dashed #d1d5db;border-radius:1.5vmin;background:#f9fafb;font-size:2.5vmin;font-family:'Jua',sans-serif;resize:none;overflow-y:auto;}
 
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        @keyframes rabbitBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5vmin)}}
+        @keyframes fadeInScale{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+        @keyframes slideUp{from{opacity:0;transform:translateY(3vmin)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spinAnim{to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+        @keyframes slideInBottom{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        @keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+        .rabbit-bounce{animation:rabbitBounce 2s ease-in-out infinite;}
+        .fade-in-scale{animation:fadeInScale 0.3s ease-out;}
+        .slide-up{animation:slideUp 0.3s ease-out;}
+        .spin{animation:spinAnim 1s linear infinite;}
+        .pulse-record{animation:pulse 0.9s ease-in-out infinite;}
+        .slide-in-bottom{animation:slideInBottom 0.3s ease-out;}
+        .pop-in{animation:popIn 0.25s ease-out;}
     </style>
 </head>
 
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
-        const { motion, AnimatePresence } = window.Motion;
+        const { useState, useEffect, useRef } = React;
 
-        // --- 아이콘 컴포넌트들 ---
-        const Icon = ({ name, size = 24, className = "" }) => {
-            const iconHtml = lucide.createIcons({ icons: { [name]: {} }, nameAttr: 'data-lucide', attrs: { width: size, height: size, class: className } });
-            const svgStr = lucide.icons[name].toSvg({ width: size, height: size, class: className });
-            return <span dangerouslySetInnerHTML={{ __html: svgStr }} />;
+        // --- 인라인 SVG 아이콘 ---
+        const svgBase = (d, extra='') => (size, cls) =>
+            `<svg width="${size}" height="${size}" class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+        const ICONS = {
+            'mic': svgBase('<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>'),
+            'volume-2': svgBase('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>'),
+            'volume-x': svgBase('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/>'),
+            'loader-2': svgBase('<path d="M21 12a9 9 0 1 1-6.219-8.56"/>'),
+            'check-circle': svgBase('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'),
+            'star': svgBase('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'),
+            'award': svgBase('<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>'),
+        };
+        const Icon = ({ name, size=24, className='' }) => {
+            const fn = ICONS[name];
+            if (!fn) return null;
+            return <span dangerouslySetInnerHTML={{ __html: fn(size, className) }} style={{display:'inline-flex',alignItems:'center'}}/>;
         };
 
         // --- 토끼 캐릭터 (SVG) ---
         const RabbitCharacter = ({ className = "" }) => (
-            <motion.div className={`relative inline-block ${className}`} animate={{ y: [0, -15, 0] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
+            <div className={`relative inline-block rabbit-bounce ${className}`}>
                 <svg width="100" height="120" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Ears */}
                     <path d="M35 50C35 50 15 10 30 10C45 10 50 40 50 40" fill="#FFFFFF" stroke="#4B5563" strokeWidth="3" strokeLinecap="round" />
                     <path d="M33 45C33 45 22 18 31 18C39 18 45 35 45 35" fill="#FBCFE8" />
                     <path d="M65 50C65 50 85 10 70 10C55 10 50 40 50 40" fill="#FFFFFF" stroke="#4B5563" strokeWidth="3" strokeLinecap="round" />
                     <path d="M67 45C67 45 78 18 69 18C61 18 55 35 55 35" fill="#FBCFE8" />
-                    {/* Face */}
                     <circle cx="50" cy="70" r="35" fill="#FFFFFF" stroke="#4B5563" strokeWidth="3" />
-                    {/* Eyes */}
                     <circle cx="38" cy="65" r="4" fill="#1F2937" />
                     <circle cx="62" cy="65" r="4" fill="#1F2937" />
                     <circle cx="39" cy="64" r="1.5" fill="#FFFFFF" />
                     <circle cx="63" cy="64" r="1.5" fill="#FFFFFF" />
-                    {/* Cheeks */}
                     <ellipse cx="30" cy="72" rx="5" ry="3" fill="#FBCFE8" opacity="0.8" />
                     <ellipse cx="70" cy="72" rx="5" ry="3" fill="#FBCFE8" opacity="0.8" />
-                    {/* Nose/Mouth */}
                     <path d="M48 72C48 72 50 74 52 72" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" />
                     <path d="M50 73V76C50 76 46 80 50 80C54 80 50 76 50 76" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-            </motion.div>
+            </div>
         );
+
 
         // --- 사운드 관리 ---
         const playSound = (type, isMuted) => {
@@ -104,9 +146,10 @@
             // 아래에 선생님의 구글 앱스 스크립트 웹 앱 URL을 붙여넣으세요!
             const GAS_URL = "https://script.google.com/macros/s/AKfycbwEqZ2wN23-lg4eQ-Ckt4ouGFD7DGMGksrYMCwYf6ntWabQrUH3bj-Wqn7mmvw9PbzZ/exec";
 
-            const [gasUrl, setGasUrl] = useState(GAS_URL);
+            const [gasUrl] = useState(GAS_URL);
             const [isMuted, setIsMuted] = useState(true);
-            const [phase, setPhase] = useState('loading'); // loading, error, login, intro, prerecord, dictionary, explore, etiquette, postrecord, eval, reward
+            const [micAllowed, setMicAllowed] = useState(false);
+            const [phase, setPhase] = useState('loading'); // loading, error, perm, login, intro, prerecord, dictionary, explore, etiquette, postrecord, eval, reward
             const [students, setStudents] = useState([]);
             const [places, setPlaces] = useState([]);
             const [etiquette, setEtiquette] = useState([]);
@@ -147,6 +190,11 @@
                 if (isMuted || !window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
                 const utterThis = new SpeechSynthesisUtterance(text);
+                const voices = window.speechSynthesis.getVoices();
+                const googleVoice = voices.find(v => v.name.includes('Google') && v.lang === 'ko-KR');
+                if (googleVoice) {
+                    utterThis.voice = googleVoice;
+                }
                 utterThis.rate = 0.9;
                 utterThis.pitch = 1.1;
                 utterThis.lang = 'ko-KR';
@@ -163,7 +211,7 @@
                         setStudents(data.students || []);
                         setPlaces(data.places || []);
                         setEtiquette(data.etiquette || []);
-                        setPhase('login');
+                        setPhase('perm'); // 데이터 로드 후 마이크 권한 요청
                     } else {
                         setErrorMsg("데이터를 불러오는데 실패했어요. URL을 확인해주세요.");
                         setPhase('error');
@@ -184,6 +232,19 @@
                     setPhase('error');
                 }
             }, []);
+
+            // 마이크 권한 요청
+            const requestMicPermission = async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(t => t.stop()); // 권한만 얻고 바로 해제
+                    setMicAllowed(true);
+                    setPhase('login');
+                } catch (e) {
+                    setMicAllowed(false);
+                    setPhase('login'); // 거부해도 진행(녹음 기능만 비활성화)
+                }
+            };
 
             // 녹음 시작
             const startRecording = async () => {
@@ -295,121 +356,131 @@
                 }
             };
 
-            // --- UI Components ---
+            // TopBar
             const TopBar = () => (
-                <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
-                    <button onClick={() => setIsMuted(!isMuted)} className={`p-3 rounded-full shadow-lg transition-all ${isMuted ? 'bg-gray-200 text-gray-500' : 'bg-white text-green-500'}`}>
-                        <Icon name={isMuted ? 'volume-x' : 'volume-2'} />
+                <div className="v-top-bar">
+                    <button onClick={() => setIsMuted(!isMuted)} className={`v-top-btn ${isMuted ? 'bg-gray-100' : 'bg-green-100'}`}>
+                        {isMuted ? '🔇' : '🔊'}
                     </button>
                 </div>
             );
 
-            // 1. Loading Phase
-            if (phase === 'loading') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <RabbitCharacter className="mb-6 w-32 h-32" />
-                        <Icon name="loader-2" className="animate-spin text-green-500 mb-4" size={48} />
-                        <h1 className="text-2xl font-bold text-green-700">{loadingMsg || "앱을 준비하는 중입니다..."}</h1>
-                    </div>
-                );
-            }
+            // 1. Loading
+            if (phase === 'loading') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center'}}>
+                    <RabbitCharacter />
+                    <div className="spin" style={{fontSize:'5vmin',marginTop:'2vmin'}}>⏳</div>
+                    <p className="v-h2" style={{color:'#15803d',marginTop:'2vmin'}}>{loadingMsg || '앱을 준비하는 중...'}</p>
+                </div>
+            );
 
-            // Error Phase
-            if (phase === 'error') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <RabbitCharacter className="mb-6 w-32 h-32" />
-                        <h1 className="text-2xl font-bold text-red-600 mb-4">앗, 설정이 필요해요!</h1>
-                        <p className="text-gray-700 font-bold break-keep">{errorMsg}</p>
-                    </div>
-                );
-            }
+            // Error
+            if (phase === 'error') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center'}}>
+                    <RabbitCharacter />
+                    <p className="v-h2" style={{color:'#ef4444',marginTop:'2vmin'}}>앗, 설정이 필요해요!</p>
+                    <p className="v-body" style={{color:'#6b7280',marginTop:'1vmin',maxWidth:'70vmin'}}>{errorMsg}</p>
+                </div>
+            );
 
-            // 2. Login Phase
-            if (phase === 'login') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <TopBar />
-                        <RabbitCharacter className="mb-6 w-32 h-32" />
-                        <h1 className="text-3xl font-bold text-green-700 mb-6">내 이름을 찾아보세요!</h1>
-                        <div className="flex flex-wrap justify-center gap-3 max-w-2xl">
-                            {students.map((s, i) => (
-                                <button key={i} onClick={() => { setStudentName(s); setPhase('intro'); }} className="px-6 py-3 bg-white border-2 border-green-200 rounded-full font-bold text-lg text-green-700 hover:bg-green-50 hover:border-green-400 active:scale-95 transition-all shadow-sm">
-                                    {s}
-                                </button>
-                            ))}
+            // Mic Permission
+            if (phase === 'perm') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'3vmin'}}>
+                    <RabbitCharacter />
+                    <div className="v-card" style={{textAlign:'center'}}>
+                        <div style={{fontSize:'8vmin'}}>🎤</div>
+                        <p className="v-h2" style={{color:'#15803d',margin:'2vmin 0 1vmin'}}>마이크 사용 필요해요!</p>
+                        <p className="v-body" style={{color:'#6b7280',marginBottom:'3vmin'}}>이 앱은 학습 전후 말하기를 녹음해요.<br/>마이크 사용을 허락해 주세요.</p>
+                        <button className="v-btn v-btn-green" onClick={requestMicPermission}>🐇 한번 시작하기!</button>
+                    </div>
+                </div>
+            );
+
+            // Login
+            if (phase === 'login') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
+                    <TopBar />
+                    <RabbitCharacter />
+                    <p className="v-h1" style={{color:'#15803d'}}>학교 사람 탐험대</p>
+                    <p className="v-body" style={{color:'#6b7280'}}>내 이름을 선택하고 시작하세요!</p>
+                    <div className="v-card">
+                        <select className="v-select" value={studentName} onChange={(e) => setStudentName(e.target.value)}>
+                            <option value="">이름을 선택하세요 ▼</option>
+                            {students.map((s, i) => <option key={i} value={s}>{s}</option>)}
+                        </select>
+                        <button className="v-btn v-btn-green" style={{opacity: studentName ? 1 : 0.4}}
+                            onClick={() => { if (studentName) setPhase('intro'); }}>
+                            시작하기 🐇
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Intro
+            if (phase === 'intro') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
+                    <TopBar />
+                    <RabbitCharacter />
+                    <div className="v-card fade-in-scale" style={{textAlign:'center'}}>
+                        <p className="v-h2" style={{color:'#16a34a',marginBottom:'1.5vmin'}}>안녕, {studentName}! 👋</p>
+                        <p className="v-body" style={{color:'#374151',marginBottom:'3vmin'}}>
+                            우리 학교에는 어떤 사람들이 있을까요?<br/>미리 아는 대로 말해보아요!
+                        </p>
+                        <button className="v-btn v-btn-green"
+                            onClick={() => { speak('우리 학교에 어떤 사람들이 있는지 아는 대로 말해보세요.'); setPhase('prerecord'); }}>
+                            사전 녹음하러 가기 🎤
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Pre-Record
+            if (phase === 'prerecord') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
+                    <TopBar />
+                    <div className="v-card" style={{textAlign:'center'}}>
+                        <p className="v-h2" style={{color:'#15803d',marginBottom:'1vmin'}}>학교에는 누가 있을까요?</p>
+                        <p className="v-body" style={{color:'#9ca3af',marginBottom:'2vmin'}}>마이크 버튼을 눌러 말해보세요.</p>
+                        <button className={`v-mic ${isRecording ? 'pulse-record' : ''}`}
+                            style={{background: isRecording ? '#fee2e2' : '#dcfce7', borderColor: isRecording ? '#ef4444' : '#22c55e', color: isRecording ? '#ef4444' : '#22c55e'}}
+                            onClick={isRecording ? null : startRecording} disabled={isRecording}>
+                            🎤
+                        </button>
+                        <p className="v-body" style={{color: isRecording ? '#ef4444' : '#9ca3af', marginTop:'1.5vmin'}}>
+                            {isRecording ? '🔴 녹음 중... (종료 버튼을 눌러주세요)' : '버튼을 눌러 시작'}
+                        </p>
+                        <div className="v-txt-area" style={{marginTop:'2vmin',textAlign:'left'}}>
+                            {preAudioText || <span style={{color:'#d1d5db'}}>말한 내용이 여기에 나타납니다...</span>}
                         </div>
-                    </div>
-                );
-            }
-
-            // 3. Intro Phase
-            if (phase === 'intro') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
-                        <TopBar />
-                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white p-8 rounded-[2rem] shadow-xl max-w-md w-full border-4 border-green-100 z-10 relative">
-                            <RabbitCharacter className="absolute -top-16 left-1/2 -translate-x-1/2 w-24 h-24" />
-                            <h2 className="text-2xl font-bold text-green-600 mt-6 mb-4">안녕, {studentName}!</h2>
-                            <p className="text-lg text-gray-700 break-keep mb-6">
-                                우리 학교에는 어떤 사람들이 있을까요?<br />미리 아는 대로 말해보아요!
-                            </p>
-                            <button onClick={() => { speak("우리 학교에 어떤 사람들이 있는지 아는 대로 말해보세요."); setPhase('prerecord'); }} className="w-full py-4 bg-green-500 text-white rounded-xl font-bold text-xl hover:bg-green-600 active:scale-95 transition-transform shadow-md">
-                                사전 녹음하러 가기
+                        {isRecording ? (
+                            <button className="v-btn" style={{marginTop:'2vmin', background:'#ef4444', color:'white'}}
+                                onClick={() => { stopRecording(); setPhase('dictionary'); }}>
+                                🛑 녹음 종료 및 출발하기 →
                             </button>
-                        </motion.div>
-                    </div>
-                );
-            }
-
-            // 4. Pre-Record Phase
-            if (phase === 'prerecord') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <TopBar />
-                        <div className="bg-white p-8 rounded-[2rem] shadow-xl max-w-md w-full border-4 border-green-100">
-                            <h2 className="text-2xl font-bold text-green-700 mb-2">학교에는 누가 있을까요?</h2>
-                            <p className="text-gray-500 mb-8">마이크 버튼을 누르고 말해보세요.</p>
-
-                            <motion.button
-                                animate={isRecording ? { scale: [1, 1.1, 1], boxShadow: ["0px 0px 0px rgba(239,68,68,0)", "0px 0px 20px rgba(239,68,68,0.5)", "0px 0px 0px rgba(239,68,68,0)"] } : {}}
-                                transition={{ repeat: Infinity, duration: 1 }}
-                                onClick={isRecording ? stopRecording : startRecording}
-                                className={`w-32 h-32 rounded-full mx-auto flex items-center justify-center shadow-lg transition-colors ${isRecording ? 'bg-red-100 border-4 border-red-500' : 'bg-green-100 border-4 border-green-500 hover:bg-green-200'}`}
-                            >
-                                <Icon name="mic" size={48} className={isRecording ? "text-red-500" : "text-green-500"} />
-                            </motion.button>
-
-                            <div className="mt-8 h-24 p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 overflow-y-auto text-left">
-                                {preAudioText || <span className="text-gray-400">여기에 말한 내용이 나타납니다...</span>}
-                            </div>
-
-                            <button onClick={() => setPhase('dictionary')} className="mt-6 w-full py-4 bg-green-500 text-white rounded-xl font-bold text-xl shadow-md active:scale-95 disabled:opacity-50" disabled={isRecording}>
-                                탐험 시작하기
+                        ) : (
+                            <button className="v-btn v-btn-green" style={{marginTop:'2vmin', opacity: preAudioText ? 1 : 0.4}}
+                                disabled={!preAudioText} onClick={() => setPhase('dictionary')}>
+                                탐험 시작하기 →
                             </button>
-                        </div>
+                        )}
                     </div>
-                );
-            }
+                </div>
+            );
 
-            // 5. Dictionary Concept
-            if (phase === 'dictionary') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <TopBar />
-                        <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-white p-8 rounded-[2rem] shadow-xl max-w-md w-full border-4 border-yellow-100 relative">
-                            <h2 className="text-3xl font-bold text-yellow-600 mb-4">학교 사람 사전</h2>
-                            <p className="text-lg text-gray-700 mb-6 break-keep">
-                                우리 학교에는 다양한 역할을 해주시는 고마운 분들이 많이 계셔요. 직접 장소를 돌아다니며 어떤 분들이 계신지 알아볼까요?
-                            </p>
-                            <button onClick={() => setPhase('explore')} className="w-full py-4 bg-yellow-400 text-white rounded-xl font-bold text-xl hover:bg-yellow-500 active:scale-95 transition-transform shadow-md">
-                                출발하기
-                            </button>
-                        </motion.div>
+            // Dictionary
+            if (phase === 'dictionary') return (
+                <div className="v-screen" style={{background:'#fffbeb',textAlign:'center',gap:'2vmin'}}>
+                    <TopBar />
+                    <div className="v-card slide-up" style={{textAlign:'center', borderColor:'#fde68a'}}>
+                        <div style={{fontSize:'7vmin'}}>📖</div>
+                        <p className="v-h2" style={{color:'#d97706',margin:'1vmin 0'}}>학교 사람 사전</p>
+                        <p className="v-body" style={{color:'#374151',marginBottom:'3vmin'}}>
+                            우리 학교에는 다양한 역할을 해주시는<br/>고마운 분들이 많이 계셔요!<br/>직접 장소를 돌아다니며 알아볼까요?
+                        </p>
+                        <button className="v-btn v-btn-yellow" onClick={() => setPhase('explore')}>출발하기 🚀</button>
                     </div>
-                );
-            }
+                </div>
+            );
 
             // 6. Explore Places
             if (phase === 'explore') {
@@ -442,247 +513,198 @@
                 };
 
                 return (
-                    <div className="min-h-screen flex flex-col items-center p-6 max-w-md mx-auto w-full relative">
+                    <div className="v-screen" style={{background:'#f0fdf4',justifyContent:'flex-start',paddingTop:'6vmin',position:'relative'}}>
                         <TopBar />
-                        <h2 className="text-2xl font-bold text-green-700 mt-8 mb-6">어디로 가볼까요?</h2>
-
-                        {/* 지도/버튼 화면 */}
-                        <div className="grid grid-cols-2 gap-4 w-full mb-8">
-                            {places.map((p, i) => (
-                                <button key={i} onClick={() => { setCurrentPlaceIdx(i); setFeedback(null); speak(p['질문']); }}
-                                    className={`p-4 rounded-2xl border-4 flex flex-col items-center justify-center gap-2 transition-all shadow-sm ${exploredPlaces.includes(i) ? 'bg-gray-100 border-gray-200 text-gray-400' : 'bg-white border-green-200 hover:border-green-400 active:scale-95'}`}
-                                >
-                                    <span className="text-4xl">{p['이모지']}</span>
-                                    <span className="font-bold">{p['장소']}</span>
-                                    {exploredPlaces.includes(i) && <Icon name="check-circle" size={20} className="text-green-500 absolute top-2 right-2" />}
+                        <p className="v-h2" style={{color:'#15803d',marginBottom:'2vmin'}}>어디로 가볼까요? 🗺️</p>
+                        <div className="v-grid" style={{width:'100%',maxWidth:'90vmin'}}>
+                            {places.map((p,i)=>(
+                                <button key={i} className={`v-place-btn ${exploredPlaces.includes(i)?'done':''}`}
+                                    onClick={()=>{setCurrentPlaceIdx(i);setFeedback(null);speak(p['질문']);}}>
+                                    <span className="v-place-emoji">{p['이모지']}</span>
+                                    <span>{exploredPlaces.includes(i)?'✅ ':''}{p['장소']}</span>
                                 </button>
                             ))}
                         </div>
-
                         {allDone && (
-                            <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} onClick={() => setPhase('etiquette')} className="w-full py-4 bg-green-500 text-white rounded-xl font-bold text-xl shadow-lg active:scale-95">
-                                다음 활동으로 넘어가기
-                            </motion.button>
+                            <button className="v-btn v-btn-green fade-in-scale" style={{marginTop:'2vmin',maxWidth:'80vmin'}}
+                                onClick={()=>setPhase('etiquette')}>다음 활동으로 →</button>
                         )}
-
-                        {/* 퀴즈 팝업 */}
-                        <AnimatePresence>
-                            {currentPlace && !feedback && !allDone && currentPlaceIdx !== null && !exploredPlaces.includes(currentPlaceIdx) && (
-                                <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] p-6 z-40 max-w-md mx-auto border-t-4 border-green-200">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-3xl">{currentPlace['이모지']}</span>
-                                            <h3 className="text-xl font-bold text-gray-800">{currentPlace['장소']}</h3>
-                                        </div>
+                        {currentPlace && !feedback && !allDone && !exploredPlaces.includes(currentPlaceIdx) && (
+                            <div className="v-overlay">
+                                <div className="v-popup pop-in" style={{border:'0.4vmin solid #86efac', textAlign:'center'}}>
+                                    <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'1.5vmin',marginBottom:'1.5vmin'}}>
+                                        <span style={{fontSize:'6vmin'}}>{currentPlace['이모지']}</span>
+                                        <p className="v-h3" style={{color:'#1f2937'}}>{currentPlace['장소']}</p>
                                     </div>
-                                    <p className="text-lg font-bold text-gray-600 mb-6 break-keep">{currentPlace['질문']}</p>
-                                    <div className="space-y-3">
-                                        <button onClick={() => handlePlaceAnswer(0)} className="w-full p-4 text-left border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-green-50 hover:border-green-300 active:scale-95">{currentPlace['선택지1']}</button>
-                                        <button onClick={() => handlePlaceAnswer(1)} className="w-full p-4 text-left border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-green-50 hover:border-green-300 active:scale-95">{currentPlace['선택지2']}</button>
+                                    <p className="v-body" style={{color:'#4b5563',marginBottom:'3vmin',fontWeight:700}}>{currentPlace['질문']}</p>
+                                    <div style={{display:'flex',flexDirection:'column',gap:'1.5vmin'}}>
+                                        <button className="v-btn v-btn-gray" style={{textAlign:'center'}} onClick={()=>handlePlaceAnswer(0)}>{currentPlace['선택지1']}</button>
+                                        <button className="v-btn v-btn-gray" style={{textAlign:'center'}} onClick={()=>handlePlaceAnswer(1)}>{currentPlace['선택지2']}</button>
                                     </div>
-                                </motion.div>
-                            )}
-
-                            {/* 피드백 팝업 */}
-                            {feedback && (
-                                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-6">
-                                    <div className={`bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-sm text-center border-4 ${feedback.type === 'success' ? 'border-green-400' : 'border-red-400'}`}>
-                                        <div className="text-6xl mb-4">{feedback.type === 'success' ? '🎉' : '🤔'}</div>
-                                        <h3 className={`text-2xl font-bold mb-4 ${feedback.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{feedback.text}</h3>
-                                        {feedback.type === 'success' ? (
-                                            <p className="text-gray-500 font-bold">잠시 후 자동으로 넘어갑니다...</p>
-                                        ) : (
-                                            <button onClick={() => setFeedback(null)} className="mt-4 px-8 py-3 bg-red-500 text-white rounded-xl font-bold">다시 풀기</button>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                </div>
+                            </div>
+                        )}
+                        {feedback && (
+                            <div className="v-overlay">
+                                <div className="v-popup pop-in" style={{border:`0.5vmin solid ${feedback.type==='success'?'#22c55e':'#ef4444'}`}}>
+                                    <div style={{fontSize:'8vmin'}}>{feedback.type==='success'?'🎉':'🤔'}</div>
+                                    <p className="v-h3" style={{color:feedback.type==='success'?'#16a34a':'#dc2626',margin:'1.5vmin 0'}}>{feedback.text}</p>
+                                    {feedback.type==='success'
+                                        ?<p className="v-body" style={{color:'#9ca3af'}}>잠시 후 자동으로 넘어갑니다...</p>
+                                        :<button className="v-btn" style={{background:'#ef4444',color:'white',marginTop:'1.5vmin'}} onClick={()=>setFeedback(null)}>다시 풀기</button>}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 );
             }
 
-            // 7. Etiquette Quiz
+            // Etiquette
             if (phase === 'etiquette') {
                 const currentQ = etiquette[currentEtiquetteIdx];
-                if (!currentQ) return <div className="min-h-screen"></div>;
-
-                const handleEtiquetteAnswer = (optionIndex) => {
-                    const isCorrect = (optionIndex + 1).toString() === currentQ['정답(1또는2)'].toString();
-                    if (isCorrect) {
-                        playSound('correct', isMuted);
-                        setFeedback({ type: 'success', text: currentQ['정답피드백'] });
-                        speak(currentQ['정답피드백']);
-                        setTimeout(() => {
+                if (!currentQ) return <div className="v-screen"/>;
+                const handleEtiquetteAnswer = (idx) => {
+                    const ok = (idx+1).toString() === currentQ['정답(1또는2)'].toString();
+                    if (ok) {
+                        playSound('correct',isMuted); speak(currentQ['정답피드백']);
+                        setFeedback({type:'success',text:currentQ['정답피드백']});
+                        setTimeout(()=>{
                             setFeedback(null);
-                            if (currentEtiquetteIdx < etiquette.length - 1) {
-                                setCurrentEtiquetteIdx(currentEtiquetteIdx + 1);
-                                speak(etiquette[currentEtiquetteIdx + 1]['시나리오']);
-                            } else {
-                                setPhase('postrecord');
-                            }
-                        }, 3000);
+                            if (currentEtiquetteIdx < etiquette.length-1) setCurrentEtiquetteIdx(currentEtiquetteIdx+1);
+                            else setPhase('postrecord');
+                        },3000);
                     } else {
-                        playSound('wrong', isMuted);
-                        setFeedback({ type: 'error', text: currentQ['오답피드백'] });
-                        speak(currentQ['오답피드백']);
-                        if (!wrongEtiquette.includes(currentQ['ID'])) {
-                            setWrongEtiquette([...wrongEtiquette, currentQ['ID']]);
-                        }
+                        playSound('wrong',isMuted); speak(currentQ['오답피드백']);
+                        setFeedback({type:'error',text:currentQ['오답피드백']});
+                        if (!wrongEtiquette.includes(currentQ['ID'])) setWrongEtiquette([...wrongEtiquette,currentQ['ID']]);
                     }
                 };
-
                 return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 max-w-md mx-auto w-full relative">
+                    <div className="v-screen" style={{background:'#f0fdf4',gap:'2vmin',position:'relative'}}>
                         <TopBar />
-                        <div className="w-full mb-6">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="font-bold text-green-700">상황별 예절 퀴즈</span>
-                                <span className="text-gray-500 font-bold">{currentEtiquetteIdx + 1} / {etiquette.length}</span>
+                        <div style={{width:'100%',maxWidth:'80vmin'}}>
+                            <div style={{display:'flex',justifyContent:'space-between',marginBottom:'1vmin'}}>
+                                <span className="v-body" style={{color:'#15803d',fontWeight:700}}>상황별 예절 퀴즈</span>
+                                <span className="v-body" style={{color:'#9ca3af'}}>{currentEtiquetteIdx+1} / {etiquette.length}</span>
                             </div>
-                            <div className="h-3 w-full bg-gray-200 rounded-full overflow-hidden">
-                                <motion.div className="h-full bg-green-500" initial={{ width: 0 }} animate={{ width: `${((currentEtiquetteIdx) / etiquette.length) * 100}%` }} />
+                            <div className="v-progress"><div className="v-progress-fill" style={{width:`${(currentEtiquetteIdx/etiquette.length)*100}%`}}/></div>
+                        </div>
+                        <div className="v-card">
+                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'2vmin'}}>
+                                <p className="v-h3" style={{color:'#1f2937',flex:1,paddingRight:'2vmin'}}>{currentQ['시나리오']}</p>
+                                <button onClick={()=>speak(currentQ['시나리오'])} style={{fontSize:'3.5vmin',background:'#f0fdf4',border:'none',borderRadius:'50%',padding:'1vmin',cursor:'pointer'}}>🔊</button>
+                            </div>
+                            <div style={{display:'flex',flexDirection:'column',gap:'1.5vmin'}}>
+                                <button className="v-btn v-btn-gray" style={{textAlign:'left'}} onClick={()=>handleEtiquetteAnswer(0)}>{currentQ['선택지1']}</button>
+                                <button className="v-btn v-btn-gray" style={{textAlign:'left'}} onClick={()=>handleEtiquetteAnswer(1)}>{currentQ['선택지2']}</button>
                             </div>
                         </div>
-
-                        <div className="bg-white p-8 rounded-[2rem] shadow-xl w-full border-4 border-green-100 relative">
-                            <RabbitCharacter className="absolute -top-12 -right-4 w-20 h-20" />
-                            <div className="flex justify-between items-start mb-6 mt-4">
-                                <p className="text-xl font-bold text-gray-800 break-keep flex-1 pr-2">{currentQ['시나리오']}</p>
-                                <button onClick={() => speak(currentQ['시나리오'])} className="p-2 bg-green-50 text-green-500 rounded-full">
-                                    <Icon name="volume-2" size={20} />
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                <button onClick={() => handleEtiquetteAnswer(0)} className="w-full p-4 text-left border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-green-50 hover:border-green-400 active:scale-95 transition-all">{currentQ['선택지1']}</button>
-                                <button onClick={() => handleEtiquetteAnswer(1)} className="w-full p-4 text-left border-2 border-gray-200 rounded-xl font-bold text-gray-700 hover:bg-green-50 hover:border-green-400 active:scale-95 transition-all">{currentQ['선택지2']}</button>
-                            </div>
-                        </div>
-
-                        {/* 피드백 팝업 */}
-                        <AnimatePresence>
-                            {feedback && (
-                                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-6">
-                                    <div className={`bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-sm text-center border-4 ${feedback.type === 'success' ? 'border-green-400' : 'border-red-400'}`}>
-                                        <div className="text-6xl mb-4">{feedback.type === 'success' ? '✨' : '😅'}</div>
-                                        <h3 className={`text-2xl font-bold mb-4 ${feedback.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>{feedback.text}</h3>
-                                        {feedback.type === 'success' ? (
-                                            <p className="text-gray-500 font-bold">잠시 후 자동으로 넘어갑니다...</p>
-                                        ) : (
-                                            <button onClick={() => setFeedback(null)} className="mt-4 px-8 py-3 bg-red-500 text-white rounded-xl font-bold">다시 풀기</button>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                );
-            }
-
-            // 8. Post-Record Phase
-            if (phase === 'postrecord') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <TopBar />
-                        <div className="bg-white p-8 rounded-[2rem] shadow-xl max-w-md w-full border-4 border-green-100">
-                            <h2 className="text-2xl font-bold text-green-700 mb-2">학습을 마쳤어요!</h2>
-                            <p className="text-gray-500 mb-8 break-keep">지금까지 알아본 학교 사람들을 다시 한번 말해볼까요?</p>
-
-                            <motion.button
-                                animate={isRecording ? { scale: [1, 1.1, 1], boxShadow: ["0px 0px 0px rgba(239,68,68,0)", "0px 0px 20px rgba(239,68,68,0.5)", "0px 0px 0px rgba(239,68,68,0)"] } : {}}
-                                transition={{ repeat: Infinity, duration: 1 }}
-                                onClick={isRecording ? stopRecording : startRecording}
-                                className={`w-32 h-32 rounded-full mx-auto flex items-center justify-center shadow-lg transition-colors ${isRecording ? 'bg-red-100 border-4 border-red-500' : 'bg-green-100 border-4 border-green-500 hover:bg-green-200'}`}
-                            >
-                                <Icon name="mic" size={48} className={isRecording ? "text-red-500" : "text-green-500"} />
-                            </motion.button>
-
-                            <div className="mt-8 h-24 p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 overflow-y-auto text-left">
-                                {postAudioText || <span className="text-gray-400">여기에 말한 내용이 나타납니다...</span>}
-                            </div>
-
-                            <button onClick={() => setPhase('eval')} className="mt-6 w-full py-4 bg-green-500 text-white rounded-xl font-bold text-xl shadow-md active:scale-95 disabled:opacity-50" disabled={isRecording}>
-                                평가하러 가기
-                            </button>
-                        </div>
-                    </div>
-                );
-            }
-
-            // 9. Self Evaluation Phase
-            if (phase === 'eval') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative">
-                        {isLoading && (
-                            <div className="absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center backdrop-blur-sm">
-                                <Icon name="loader-2" className="animate-spin text-green-500 mb-4" size={48} />
-                                <p className="font-bold text-green-700 text-lg">{loadingMsg}</p>
+                        {feedback && (
+                            <div className="v-overlay">
+                                <div className="v-popup pop-in" style={{border:`0.5vmin solid ${feedback.type==='success'?'#22c55e':'#ef4444'}`}}>
+                                    <div style={{fontSize:'8vmin'}}>{feedback.type==='success'?'✨':'😅'}</div>
+                                    <p className="v-h3" style={{color:feedback.type==='success'?'#16a34a':'#dc2626',margin:'1.5vmin 0'}}>{feedback.text}</p>
+                                    {feedback.type==='success'
+                                        ?<p className="v-body" style={{color:'#9ca3af'}}>잠시 후 자동으로 넘어갑니다...</p>
+                                        :<button className="v-btn" style={{background:'#ef4444',color:'white',marginTop:'1.5vmin'}} onClick={()=>setFeedback(null)}>다시 풀기</button>}
+                                </div>
                             </div>
                         )}
-                        <TopBar />
-                        <div className="bg-white p-8 rounded-[2rem] shadow-xl max-w-md w-full border-4 border-green-100">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-2">스스로 평가해 보아요</h2>
-                            <p className="text-gray-500 mb-8 break-keep">나는 오늘 학습에 얼마나 열심히 참여했나요?</p>
+                    </div>
+                );
+            }
 
-                            <div className="flex justify-center gap-2 mb-8">
-                                {[1, 2, 3, 4, 5].map((s) => (
-                                    <button key={s} onClick={() => handleStarClick(s)} className="active:scale-90 transition-transform">
-                                        <Icon name="star" size={48} className={s <= stars ? "text-yellow-400 fill-yellow-400" : "text-gray-200"} />
-                                    </button>
-                                ))}
-                            </div>
-
-                            {stars > 0 && stars <= 3 && (
-                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-orange-50 p-4 rounded-xl border-2 border-orange-200 mb-6">
-                                    <p className="text-orange-700 font-bold mb-4">조금 더 알아보고 싶나요?</p>
-                                    <button onClick={() => {
-                                        setStars(0);
-                                        setCurrentPlaceIdx(0);
-                                        setExploredPlaces([]);
-                                        setCurrentEtiquetteIdx(0);
-                                        setWrongPlaces([]);
-                                        setWrongEtiquette([]);
-                                        setPhase('explore');
-                                    }} className="w-full py-3 bg-orange-500 text-white rounded-lg font-bold shadow-sm hover:bg-orange-600">다시 활동하기</button>
-                                    <button onClick={() => submitResults(stars)} className="w-full mt-2 py-3 text-gray-500 font-bold underline">아니요, 마칠래요.</button>
-                                </motion.div>
-                            )}
-                            {stars > 3 && (
-                                <p className="text-green-600 font-bold mb-4">정말 훌륭해요! 잠시 기다려주세요...</p>
-                            )}
+            // Post-Record
+            if (phase === 'postrecord') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
+                    <TopBar />
+                    <div className="v-card" style={{textAlign:'center'}}>
+                        <p className="v-h2" style={{color:'#15803d',marginBottom:'1vmin'}}>학습을 마쳤어요! 🎊</p>
+                        <p className="v-body" style={{color:'#9ca3af',marginBottom:'2vmin'}}>학교 사람들을 다시 한번 말해볼까요?</p>
+                        <button className={`v-mic ${isRecording?'pulse-record':''}`}
+                            style={{background:isRecording?'#fee2e2':'#dcfce7',borderColor:isRecording?'#ef4444':'#22c55e',color:isRecording?'#ef4444':'#22c55e'}}
+                            onClick={isRecording ? null : startRecording} disabled={isRecording}>🎤</button>
+                        <p className="v-body" style={{color:isRecording?'#ef4444':'#9ca3af',marginTop:'1.5vmin'}}>
+                            {isRecording ? '🔴 녹음 중... (종료 버튼을 눌러주세요)' : '버튼을 눌러 시작'}
+                        </p>
+                        <div className="v-txt-area" style={{marginTop:'2vmin',textAlign:'left'}}>
+                            {postAudioText||<span style={{color:'#d1d5db'}}>말한 내용이 여기에 나타납니다...</span>}
                         </div>
+                        {isRecording ? (
+                            <button className="v-btn" style={{marginTop:'2vmin', background:'#ef4444', color:'white'}}
+                                onClick={() => { stopRecording(); setPhase('eval'); }}>
+                                🛑 녹음 종료 및 평가하러 가기 →
+                            </button>
+                        ) : (
+                            <button className="v-btn v-btn-green" style={{marginTop:'2vmin', opacity: postAudioText ? 1 : 0.4}}
+                                disabled={!postAudioText} onClick={() => setPhase('eval')}>
+                                평가하러 가기 →
+                            </button>
+                        )}
                     </div>
-                );
-            }
+                </div>
+            );
 
-            // 10. Reward Phase
-            if (phase === 'reward') {
-                return (
-                    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-                        <TopBar />
-                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white p-8 rounded-[3rem] shadow-2xl max-w-md w-full border-8 border-double border-green-200 relative">
-                            <RabbitCharacter className="absolute -top-16 right-4 w-24 h-24" />
-                            <Icon name="award" size={80} className="mx-auto text-yellow-500 mb-4" />
-                            <h2 className="text-3xl font-black text-green-700 mb-2">예절 박사 수료증</h2>
-                            <p className="text-gray-600 font-bold mb-6">우리 학교 사람들을 알아보고<br />따뜻한 마음을 나누었어요!</p>
-
-                            <div className="bg-green-50 p-6 rounded-2xl border-2 border-dashed border-green-200 text-left mb-6">
-                                <p className="font-bold text-gray-700 mb-2">이름: {studentName}</p>
-                                <p className="font-bold text-gray-700">별점: {'⭐'.repeat(stars)}</p>
+            // Eval
+            if (phase === 'eval') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin',position:'relative'}}>
+                    {isLoading && (
+                        <div style={{position:'absolute',inset:0,background:'rgba(255,255,255,0.85)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',zIndex:60}}>
+                            <div className="spin" style={{fontSize:'5vmin'}}>⏳</div>
+                            <p className="v-body" style={{color:'#15803d',marginTop:'1vmin'}}>{loadingMsg}</p>
+                        </div>
+                    )}
+                    <TopBar />
+                    <div className="v-card" style={{textAlign:'center'}}>
+                        <p className="v-h2" style={{color:'#1f2937',marginBottom:'1vmin'}}>스스로 평가해 보아요 ⭐</p>
+                        <p className="v-body" style={{color:'#9ca3af',marginBottom:'2vmin'}}>오늘 학습에 얼마나 열심히 참여했나요?</p>
+                        <div style={{display:'flex',justifyContent:'center',gap:'1vmin',marginBottom:'2vmin'}}>
+                            {[1,2,3,4,5].map(s=>(
+                                <button key={s} className="v-star" onClick={()=>handleStarClick(s)}>
+                                    {s<=stars?'⭐':'☆'}
+                                </button>
+                            ))}
+                        </div>
+                        {stars>0 && stars<=3 && (
+                            <div className="slide-up" style={{background:'#fff7ed',border:'0.4vmin solid #fdba74',borderRadius:'2vmin',padding:'2vmin'}}>
+                                <p className="v-body" style={{color:'#c2410c',fontWeight:700,marginBottom:'1.5vmin'}}>조금 더 알아보고 싶나요?</p>
+                                <button className="v-btn" style={{background:'#f97316',color:'white',marginBottom:'1vmin'}}
+                                    onClick={()=>{setStars(0);setCurrentPlaceIdx(0);setExploredPlaces([]);setCurrentEtiquetteIdx(0);setWrongPlaces([]);setWrongEtiquette([]);setPhase('explore');}}>
+                                    다시 활동하기 🔄
+                                </button>
+                                <button className="v-btn v-btn-gray" onClick={()=>submitResults(stars)}>아니요, 마칠래요</button>
                             </div>
-
-                            <button onClick={() => window.location.reload()} className="w-full py-4 bg-green-500 text-white rounded-xl font-bold shadow-md hover:bg-green-600">처음으로 돌아가기</button>
-                        </motion.div>
+                        )}
+                        {stars>3 && <p className="v-body" style={{color:'#16a34a',fontWeight:700}}>정말 훌륭해요! 잠시 기다려주세요... ✨</p>}
                     </div>
-                );
-            }
+                </div>
+            );
+
+            // Reward
+            if (phase === 'reward') return (
+                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
+                    <TopBar />
+                    <div className="v-card fade-in-scale" style={{textAlign:'center',border:'0.5vmin double #86efac'}}>
+                        <div style={{fontSize:'9vmin'}}>🏆</div>
+                        <p className="v-h1" style={{color:'#15803d',margin:'1vmin 0'}}>예절 박사 수료증</p>
+                        <p className="v-body" style={{color:'#6b7280',marginBottom:'2vmin'}}>우리 학교 사람들을 알아보고<br/>따뜻한 마음을 나누었어요!</p>
+                        <div style={{background:'#f0fdf4',borderRadius:'2vmin',padding:'2vmin',border:'0.4vmin dashed #86efac',textAlign:'left',marginBottom:'2vmin'}}>
+                            <p className="v-body" style={{fontWeight:700,color:'#374151'}}>이름: {studentName}</p>
+                            <p className="v-body" style={{fontWeight:700,color:'#374151'}}>별점: {'⭐'.repeat(stars)}</p>
+                        </div>
+                        <button className="v-btn v-btn-green" onClick={()=>window.location.reload()}>처음으로 돌아가기 🏠</button>
+                    </div>
+                </div>
+            );
 
             return null;
+
         };
 
+        const Root = () => <App />;
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(<Root />);
     </script>
 </body>
 
