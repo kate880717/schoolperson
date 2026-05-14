@@ -1,711 +1,1508 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>학교 사람 탐험대 (토끼버전)</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>학교 사람 탐험대 🐰</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react/": "https://esm.sh/react@18.3.1/",
+    "react-dom": "https://esm.sh/react-dom@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "framer-motion": "https://esm.sh/framer-motion@11.11.1?deps=react@18.3.1,react-dom@18.3.1",
+    "lucide-react": "https://esm.sh/lucide-react@0.454.0?deps=react@18.3.1,react-dom@18.3.1"
+  }
+}
+</script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Do+Hyeon&family=Gowun+Dodum&family=Hi+Melody&display=swap');
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
-        *,*::before,*::after{box-sizing:border-box;}
-        html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;}
-        body{font-family:'Jua',sans-serif;background:#f0fdf4;touch-action:manipulation;}
-        #root{width:100vw;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+* { -webkit-tap-highlight-color: transparent; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  font-family: 'Jua', 'Gowun Dodum', sans-serif;
+  background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #ddd6fe 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-        /* vmin 기반 다이나믹 컴포넌트 */
-        .v-screen{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3vmin;overflow:hidden;position:relative;}
-        .v-card{background:white;border-radius:3vmin;padding:4vmin;width:100%;max-width:80vmin;box-shadow:0 4px 40px rgba(0,0,0,0.12);border:0.5vmin solid #d1fae5;}
-        .v-h1{font-size:5.5vmin;font-weight:900;line-height:1.2;}
-        .v-h2{font-size:4.5vmin;font-weight:800;line-height:1.2;}
-        .v-h3{font-size:3.5vmin;font-weight:700;line-height:1.3;}
-        .v-body{font-size:2.8vmin;line-height:1.5;}
-        .v-btn{width:100%;padding:2.5vmin 4vmin;font-size:4vmin;font-weight:700;border-radius:2vmin;border:none;cursor:pointer;transition:transform 0.1s,opacity 0.2s;font-family:'Jua',sans-serif;}
-        .v-btn:active{transform:scale(0.97);}
-        .v-btn-green{background:#22c55e;color:white;}
-        .v-btn-green:hover{background:#16a34a;}
-        .v-btn-yellow{background:#facc15;color:white;}
-        .v-btn-yellow:hover{background:#eab308;}
-        .v-btn-gray{background:#f3f4f6;color:#6b7280;}
-        .v-select{width:100%;padding:2vmin;font-size:3.5vmin;font-weight:700;border:0.4vmin solid #bbf7d0;border-radius:1.5vmin;background:#f0fdf4;color:#15803d;font-family:'Jua',sans-serif;outline:none;margin-bottom:2vmin;}
-        .v-select:focus{border-color:#22c55e;}
-        .v-mic{width:16vmin;height:16vmin;border-radius:50%;display:flex;align-items:center;justify-content:center;border:0.6vmin solid;font-size:6vmin;cursor:pointer;transition:transform 0.1s;margin:0 auto;}
-        .v-mic:active{transform:scale(0.95);}
-        .v-top-bar{position:absolute;top:2vmin;right:2vmin;z-index:50;}
-        .v-top-btn{padding:1.5vmin;border-radius:50%;border:none;cursor:pointer;font-size:3.5vmin;line-height:1;}
-        .v-progress{height:1.5vmin;border-radius:99px;background:#e5e7eb;overflow:hidden;width:100%;}
-        .v-progress-fill{height:100%;background:#22c55e;transition:width 0.4s ease;}
-        .v-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2vmin;width:100%;}
-        .v-place-btn{padding:2.5vmin;border-radius:2vmin;border:0.4vmin solid #bbf7d0;background:white;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1vmin;font-family:'Jua',sans-serif;font-size:2.5vmin;font-weight:700;transition:all 0.15s;}
-        .v-place-btn:active{transform:scale(0.95);}
-        .v-place-btn.done{background:#f9fafb;border-color:#e5e7eb;color:#9ca3af;}
-        .v-place-emoji{font-size:5vmin;}
-        .v-bottom-sheet{position:absolute;bottom:0;left:0;right:0;background:white;border-radius:3vmin 3vmin 0 0;padding:4vmin;box-shadow:0 -4px 30px rgba(0,0,0,0.15);border-top:0.5vmin solid #d1fae5;}
-        .v-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:60;padding:4vmin;}
-        .v-popup{background:white;border-radius:3vmin;padding:5vmin;width:100%;max-width:70vmin;text-align:center;}
-        .v-star{font-size:7vmin;cursor:pointer;transition:transform 0.1s;}
-        .v-star:active{transform:scale(0.9);}
-        .v-txt-area{width:100%;height:10vmin;padding:2vmin;border:0.4vmin dashed #d1d5db;border-radius:1.5vmin;background:#f9fafb;font-size:2.5vmin;font-family:'Jua',sans-serif;resize:none;overflow-y:auto;}
+/* 반응형 scale - 모든 기기에서 잘리지 않게 */
+.scale-wrap {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12px;
+}
+.scale-inner {
+  width: 100%;
+  max-width: 960px;
+}
 
-        @keyframes rabbitBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5vmin)}}
-        @keyframes fadeInScale{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
-        @keyframes slideUp{from{opacity:0;transform:translateY(3vmin)}to{opacity:1;transform:translateY(0)}}
-        @keyframes spinAnim{to{transform:rotate(360deg)}}
-        @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
-        @keyframes slideInBottom{from{transform:translateY(100%)}to{transform:translateY(0)}}
-        @keyframes popIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
-        .rabbit-bounce{animation:rabbitBounce 2s ease-in-out infinite;}
-        .fade-in-scale{animation:fadeInScale 0.3s ease-out;}
-        .slide-up{animation:slideUp 0.3s ease-out;}
-        .spin{animation:spinAnim 1s linear infinite;}
-        .pulse-record{animation:pulse 0.9s ease-in-out infinite;}
-        .slide-in-bottom{animation:slideInBottom 0.3s ease-out;}
-        .pop-in{animation:popIn 0.25s ease-out;}
-    </style>
+/* 폰트 */
+.font-jua { font-family: 'Jua', sans-serif; }
+.font-gaegu { font-family: 'Gaegu', sans-serif; }
+.font-hi { font-family: 'Hi Melody', cursive; }
+.font-do { font-family: 'Do Hyeon', sans-serif; }
+
+/* 타입 스케일 (저학년 친화) */
+.t-hero { font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1.15; }
+.t-h1   { font-size: clamp(1.6rem, 4.5vw, 2.4rem); line-height: 1.2; }
+.t-h2   { font-size: clamp(1.3rem, 3.5vw, 1.8rem); line-height: 1.25; }
+.t-lg   { font-size: clamp(1.15rem, 3vw, 1.5rem); line-height: 1.35; }
+.t-md   { font-size: clamp(1rem, 2.6vw, 1.25rem); line-height: 1.4; }
+.t-base { font-size: clamp(0.95rem, 2.3vw, 1.1rem); line-height: 1.45; }
+.t-sm   { font-size: clamp(0.85rem, 2vw, 1rem); line-height: 1.4; }
+
+/* 카드 */
+.card { background: white; border-radius: 28px; box-shadow: 0 20px 50px -15px rgba(0,0,0,0.18), 0 8px 20px -8px rgba(0,0,0,0.08); }
+.card-hover { transition: all 0.2s ease; cursor: pointer; }
+.card-hover:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 25px 60px -15px rgba(0,0,0,0.25); }
+.card-hover:active { transform: scale(0.98); }
+
+/* 버튼 */
+.btn { font-family: 'Jua', sans-serif; border-radius: 22px; padding: 14px 28px; box-shadow: 0 6px 0 rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08); transition: all 0.15s ease; user-select: none; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 0 rgba(0,0,0,0.12), 0 6px 16px rgba(0,0,0,0.1); }
+.btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.12); }
+
+/* 토끼 캐릭터 살랑살랑 */
+@keyframes hop { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-12px) rotate(2deg); } }
+.hop { animation: hop 2s ease-in-out infinite; }
+
+@keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.wiggle { animation: wiggle 1.5s ease-in-out infinite; }
+
+@keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.5); } 50% { box-shadow: 0 0 50px rgba(251, 191, 36, 0.9); } }
+.pulse-glow { animation: pulse-glow 1.8s ease-in-out infinite; }
+
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.float { animation: float 3s ease-in-out infinite; }
+
+@keyframes sparkle { 0%, 100% { opacity: 0; transform: scale(0.5) rotate(0); } 50% { opacity: 1; transform: scale(1.2) rotate(180deg); } }
+.sparkle { animation: sparkle 1.5s ease-in-out infinite; }
+
+/* 폭죽 */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100vh) rotate(0); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+.confetti { position: fixed; top: -20px; font-size: 2rem; pointer-events: none; animation: confetti-fall 3s linear forwards; z-index: 9999; }
+
+/* 별 펑 */
+@keyframes star-burst {
+  0% { transform: scale(0) rotate(0); opacity: 1; }
+  60% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+  100% { transform: scale(2.5) rotate(360deg); opacity: 0; }
+}
+.star-burst { position: absolute; font-size: 3rem; pointer-events: none; animation: star-burst 1.2s ease-out forwards; z-index: 9998; }
+
+/* 깜빡임 (녹음 중) */
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.blink { animation: blink 1s ease-in-out infinite; }
+
+/* 정답 펑 */
+@keyframes pop-correct { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+.pop-correct { animation: pop-correct 0.4s ease-out; }
+
+/* TTS 하이라이트 */
+.tts-active { background: linear-gradient(120deg, #fef08a 0%, #fde68a 100%); padding: 2px 6px; border-radius: 6px; transition: all 0.1s; }
+
+/* 스크롤바 숨김 */
+::-webkit-scrollbar { width: 0; }
+* { scrollbar-width: none; }
+
+/* 토끼 SVG 색 */
+.rabbit-ear-l { transform-origin: bottom center; }
+.rabbit-ear-r { transform-origin: bottom center; }
+
+/* 별점 */
+.star { font-size: clamp(2.2rem, 6vw, 3rem); cursor: pointer; transition: all 0.15s; user-select: none; }
+.star:hover { transform: scale(1.15); }
+.star-on { color: #fbbf24; filter: drop-shadow(0 4px 8px rgba(251, 191, 36, 0.5)); }
+.star-off { color: #e5e7eb; }
+
+/* 드래그앤드롭 */
+.drag-card { cursor: grab; touch-action: none; }
+.drag-card:active { cursor: grabbing; }
+.drop-zone-active { background: rgba(167, 243, 208, 0.4); border-color: #10b981 !important; transform: scale(1.05); }
+
+/* 스피커 토글 */
+.speaker-btn { transition: all 0.2s; }
+.speaker-on { background: linear-gradient(135deg, #34d399, #10b981); color: white; }
+.speaker-off { background: #e5e7eb; color: #6b7280; }
+
+/* 수료증 */
+.cert-frame { background: linear-gradient(135deg, #fef3c7, #fef9c3); border: 8px double #d97706; }
+.cert-stamp { background: radial-gradient(circle, #fee2e2 0%, #fecaca 100%); border: 4px solid #dc2626; color: #991b1b; }
+</style>
 </head>
-
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+<div id="root"></div>
 
-        // --- 인라인 SVG 아이콘 ---
-        const svgBase = (d, extra='') => (size, cls) =>
-            `<svg width="${size}" height="${size}" class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
-        const ICONS = {
-            'mic': svgBase('<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>'),
-            'volume-2': svgBase('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>'),
-            'volume-x': svgBase('<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" x2="17" y1="9" y2="15"/><line x1="17" x2="23" y1="9" y2="15"/>'),
-            'loader-2': svgBase('<path d="M21 12a9 9 0 1 1-6.219-8.56"/>'),
-            'check-circle': svgBase('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'),
-            'star': svgBase('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'),
-            'award': svgBase('<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>'),
-        };
-        const Icon = ({ name, size=24, className='' }) => {
-            const fn = ICONS[name];
-            if (!fn) return null;
-            return <span dangerouslySetInnerHTML={{ __html: fn(size, className) }} style={{display:'inline-flex',alignItems:'center'}}/>;
-        };
+<script type="text/babel" data-type="module">
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { createRoot } from 'react-dom/client';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Mic, MicOff, Volume2, VolumeX, ChevronRight, Star, Sticker,
+  Heart, Sparkles, Award, HelpCircle, RotateCcw, Play, Check,
+  X, Home, MapPin, Users, BookOpen, Smile, Edit3, ArrowRight,
+  Keyboard, Pause
+} from 'lucide-react';
 
-        // --- 토끼 캐릭터 (SVG) ---
-        const RabbitCharacter = ({ className = "" }) => (
-            <div className={`relative inline-block rabbit-bounce ${className}`}>
-                <svg width="100" height="120" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M35 50C35 50 15 10 30 10C45 10 50 40 50 40" fill="#FFFFFF" stroke="#4B5563" strokeWidth="3" strokeLinecap="round" />
-                    <path d="M33 45C33 45 22 18 31 18C39 18 45 35 45 35" fill="#FBCFE8" />
-                    <path d="M65 50C65 50 85 10 70 10C55 10 50 40 50 40" fill="#FFFFFF" stroke="#4B5563" strokeWidth="3" strokeLinecap="round" />
-                    <path d="M67 45C67 45 78 18 69 18C61 18 55 35 55 35" fill="#FBCFE8" />
-                    <circle cx="50" cy="70" r="35" fill="#FFFFFF" stroke="#4B5563" strokeWidth="3" />
-                    <circle cx="38" cy="65" r="4" fill="#1F2937" />
-                    <circle cx="62" cy="65" r="4" fill="#1F2937" />
-                    <circle cx="39" cy="64" r="1.5" fill="#FFFFFF" />
-                    <circle cx="63" cy="64" r="1.5" fill="#FFFFFF" />
-                    <ellipse cx="30" cy="72" rx="5" ry="3" fill="#FBCFE8" opacity="0.8" />
-                    <ellipse cx="70" cy="72" rx="5" ry="3" fill="#FBCFE8" opacity="0.8" />
-                    <path d="M48 72C48 72 50 74 52 72" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M50 73V76C50 76 46 80 50 80C54 80 50 76 50 76" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+/* ════════════════════════════════════════════════════════════
+   설정 — GAS 배포 후 여기에 URL 붙여넣으면 시트로 자동 저장
+   ════════════════════════════════════════════════════════════ */
+const GAS_API_URL = ''; // 예: 'https://script.google.com/macros/s/AKf.../exec'
+
+/* ════════════════════════════════════════════════════════════
+   학교 사람 데이터 — 사람 도감
+   ════════════════════════════════════════════════════════════ */
+const PLACES = [
+  {
+    id: 'classroom', name: '우리 교실', emoji: '🏫', color: '#fbbf24',
+    desc: '날마다 공부하고 친구들과 노는 곳',
+    people: [
+      { name: '담임 선생님', emoji: '👩‍🏫', job: '우리 반 친구들을 가르치고 돌봐주시는 분' },
+    ]
+  },
+  {
+    id: 'cafeteria', name: '급식실', emoji: '🍱', color: '#f97316',
+    desc: '맛있는 점심을 먹는 곳',
+    people: [
+      { name: '영양사 선생님', emoji: '🥗', job: '맛있고 영양 가득한 식단을 짜주시는 분' },
+      { name: '조리사님', emoji: '👨‍🍳', job: '맛있는 음식을 만들어 주시는 분' },
+    ]
+  },
+  {
+    id: 'health', name: '보건실', emoji: '🏥', color: '#fb7185',
+    desc: '아프거나 다쳤을 때 가는 곳',
+    people: [
+      { name: '보건 선생님', emoji: '👩‍⚕️', job: '아픈 곳을 살펴봐 주시는 분' },
+    ]
+  },
+  {
+    id: 'library', name: '도서관', emoji: '📚', color: '#a78bfa',
+    desc: '책을 읽고 빌리는 조용한 곳',
+    people: [
+      { name: '사서 선생님', emoji: '📖', job: '책을 관리하고 빌려주시는 분' },
+    ]
+  },
+  {
+    id: 'teachers', name: '교무실', emoji: '🗂️', color: '#60a5fa',
+    desc: '선생님들이 일하시는 곳',
+    people: [
+      { name: '여러 선생님', emoji: '🧑‍🏫', job: '학교 일을 함께 의논하시는 분들' },
+    ]
+  },
+  {
+    id: 'principal', name: '교장실', emoji: '🏛️', color: '#34d399',
+    desc: '학교에서 가장 어른이신 분이 일하시는 곳',
+    people: [
+      { name: '교장 선생님', emoji: '👨‍💼', job: '학교 전체를 이끌어 주시는 분' },
+    ]
+  },
+  {
+    id: 'admin', name: '행정실', emoji: '🗃️', color: '#fbbf24',
+    desc: '학교 살림을 도와주시는 곳',
+    people: [
+      { name: '행정실무사님', emoji: '🧑‍💼', job: '학교가 잘 운영되도록 살림을 챙기시는 분' },
+    ]
+  },
+  {
+    id: 'playground', name: '운동장', emoji: '⚽', color: '#5eead4',
+    desc: '뛰어놀고 운동하는 곳',
+    people: [
+      { name: '체육 선생님', emoji: '🏃‍♂️', job: '튼튼하게 자라도록 도와주시는 분' },
+    ]
+  },
+];
+
+// 학교 사람 퀴즈 — 장소 클릭 후 "누가 있을까요?"
+const PEOPLE_QUIZ = {
+  classroom: { q: '🏫 교실에서 우리를 가르쳐 주시는 분은 누구일까요?', opts: ['담임 선생님', '사서 선생님', '조리사님'], ans: 0, fb: '맞아요!\n담임 선생님은 매일 우리와 함께해요!' },
+  cafeteria: { q: '🍱 급식실에서 맛있는 음식을 만들어 주시는 분은?', opts: ['영양사 선생님과 조리사님', '교장 선생님', '담임 선생님'], ans: 0, fb: '딩동댕!\n맛있는 점심, 모두 이분들 덕분이에요!' },
+  health:    { q: '🏥 다쳤을 때 보건실에서 도와주시는 분은?', opts: ['행정실무사님', '보건 선생님', '체육 선생님'], ans: 1, fb: '정답!\n아플 때 가장 먼저 찾아갈 수 있어요!' },
+  library:   { q: '📚 도서관에서 책을 빌려주시는 분은?', opts: ['교장 선생님', '담임 선생님', '사서 선생님'], ans: 2, fb: '맞아요!\n사서 선생님은 책의 친구예요!' },
+  teachers:  { q: '🗂️ 교무실에는 누가 계실까요?', opts: ['여러 선생님들', '학생들만', '아무도 없어요'], ans: 0, fb: '딩동댕!\n선생님들이 함께 의논하시는 곳이에요!' },
+  principal: { q: '🏛️ 교장실에 계신 분은 누구일까요?', opts: ['교장 선생님', '사서 선생님', '영양사 선생님'], ans: 0, fb: '맞아요!\n학교 전체를 이끄시는 분이에요!' },
+  admin:     { q: '🗃️ 행정실에서 학교 살림을 챙기시는 분은?', opts: ['보건 선생님', '행정실무사님', '체육 선생님'], ans: 1, fb: '정답!\n학교가 잘 돌아가게 도와주세요!' },
+  playground:{ q: '⚽ 운동장에서 체육을 가르쳐 주시는 분은?', opts: ['체육 선생님', '사서 선생님', '조리사님'], ans: 0, fb: '딩동댕!\n튼튼한 몸을 만들도록 도와주세요!' },
+};
+
+/* ════════════════════════════════════════════════════════════
+   예절 상황 퀴즈 — 맥락 기반
+   ════════════════════════════════════════════════════════════ */
+const MANNERS_Q = [
+  {
+    icon: '🙋',
+    situation: '수업 시간에 화장실이 너무 급해요. 어떻게 해야 할까요?',
+    opts: ['몰래 살그머니 나가요', '손을 들고 "선생님, 화장실 다녀와도 될까요?" 여쭤봐요', '참다가 그냥 자리에서 해결해요'],
+    ans: 1,
+    fb: '맞아요!\n선생님께 공손하게 여쭤보는 게 예의예요!',
+    helpText: '"선생님, 화장실 다녀와도 될까요?" 라고 말해보세요.'
+  },
+  {
+    icon: '🍱',
+    situation: '급식실에서 점심을 받았어요. 조리사님께 무슨 말을 할까요?',
+    opts: ['아무 말 안 해요', '"잘 먹겠습니다!" 인사드려요', '"빨리 주세요!" 라고 말해요'],
+    ans: 1,
+    fb: '딩동댕!\n맛있게 만들어 주신 분께 감사 인사를 해요!',
+    helpText: '"잘 먹겠습니다!" 라고 큰 소리로 말해보세요.'
+  },
+  {
+    icon: '📚',
+    situation: '도서관에서 친구와 이야기하고 싶어요. 어떻게 할까요?',
+    opts: ['큰 소리로 신나게 말해요', '소곤소곤 작게 말해요', '책을 던지며 신호를 보내요'],
+    ans: 1,
+    fb: '맞아요!\n도서관에서는 소곤소곤 작은 목소리로요!',
+    helpText: '도서관에서는 "소곤소곤" 작은 목소리로 이야기해요.'
+  },
+  {
+    icon: '🚶',
+    situation: '복도에서 교장 선생님을 만났어요. 어떻게 할까요?',
+    opts: ['빠르게 지나가요', '멈춰서 "안녕하세요" 인사드려요', '못 본 척해요'],
+    ans: 1,
+    fb: '참 잘했어요!\n예의 바르게 인사하는 모습이 멋져요!',
+    helpText: '"안녕하세요!" 라고 공손히 인사해요.'
+  },
+  {
+    icon: '🏥',
+    situation: '쉬는 시간에 무릎을 다쳤어요. 어디로 가야 할까요?',
+    opts: ['교장실로 가요', '보건실로 가서 보건 선생님께 말해요', '운동장으로 더 가요'],
+    ans: 1,
+    fb: '딩동댕!\n다치면 꼭 보건실로 가서 알려요!',
+    helpText: '"보건 선생님, 무릎이 아파요." 라고 말해요.'
+  },
+  {
+    icon: '📖',
+    situation: '도서관에서 책을 다 읽었어요. 어떻게 할까요?',
+    opts: ['책상 위에 그냥 두고 가요', '원래 자리에 꽂아 놓아요', '가방에 넣어가요'],
+    ans: 1,
+    fb: '최고예요!\n다음 친구가 찾을 수 있게 정리해요!',
+    helpText: '"빌렸던 자리에 다시 꽂아 놓기"를 잊지 말아요.'
+  },
+  {
+    icon: '👂',
+    situation: '친구가 발표를 하고 있어요. 나는 어떻게 해야 할까요?',
+    opts: ['친구랑 떠들어요', '눈을 맞추며 잘 들어줘요', '엎드려서 자요'],
+    ans: 1,
+    fb: '맞아요!\n잘 들어주는 친구가 진짜 멋쟁이예요!',
+    helpText: '눈을 맞추고 고개를 끄덕이며 들어요.'
+  },
+  {
+    icon: '🚪',
+    situation: '교무실에 들어가야 해요. 어떻게 들어갈까요?',
+    opts: ['벌컥 문을 열고 들어가요', '문을 똑똑 두드리고 "들어가도 될까요?" 여쭤요', '소리치며 뛰어 들어가요'],
+    ans: 1,
+    fb: '딩동댕!\n노크하고 들어가는 건 기본 예의예요!',
+    helpText: '"똑똑똑, 들어가도 될까요?" 라고 말해보세요.'
+  },
+];
+
+/* ════════════════════════════════════════════════════════════
+   격려 메시지 (랜덤)
+   ════════════════════════════════════════════════════════════ */
+const CHEER = [
+  '맞아요!\n정답이에요! 🎉',
+  '참 잘했어요!\n다음에도 잘할 거예요 ⭐',
+  '최고예요!\n친구를 생각하는 마음이 멋져요 💖',
+  '딩동댕!\n예의 바른 친구네요 🌟',
+  '훌륭해요!\n학교 사람들이 좋아하실 거예요 🌈',
+];
+
+const STICKERS = [
+  { emoji: '⭐', name: '반짝 별' },
+  { emoji: '💖', name: '하트' },
+  { emoji: '🌸', name: '벚꽃' },
+  { emoji: '🌈', name: '무지개' },
+  { emoji: '🏆', name: '트로피' },
+  { emoji: '🎀', name: '리본' },
+  { emoji: '🦄', name: '유니콘' },
+  { emoji: '🌟', name: '별 빛' },
+  { emoji: '🍀', name: '네잎클로버' },
+  { emoji: '🐰', name: '토끼' },
+];
+
+/* ════════════════════════════════════════════════════════════
+   기본 학생 명단 (시트 연결 안 됐을 때 폴백)
+   ════════════════════════════════════════════════════════════ */
+const DEFAULT_STUDENTS = [
+  '1반 김도윤', '1반 박서연', '1반 이지우', '1반 최예준', '1반 정시아',
+  '2반 김하은', '2반 이서준', '2반 박지호', '2반 한유진', '2반 송민서',
+];
+
+/* ════════════════════════════════════════════════════════════
+   TTS — Google/Neural 한국어 우선
+   ════════════════════════════════════════════════════════════ */
+let cachedVoice = null;
+const pickKoreanVoice = () => {
+  if (cachedVoice) return cachedVoice;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  // 1순위: Google 한국어 (클라우드, 가장 자연스러움)
+  let v = voices.find(x => x.lang === 'ko-KR' && x.name.toLowerCase().includes('google') && !x.localService);
+  // 2순위: Wavenet/Neural2
+  if (!v) v = voices.find(x => x.lang === 'ko-KR' && (x.name.includes('Wavenet') || x.name.includes('Neural')));
+  // 3순위: 자연스러움 키워드
+  if (!v) v = voices.find(x => x.lang === 'ko-KR' && /wavenet|neural|premium|enhanced|natural/i.test(x.name));
+  // 4순위: Google ko-KR 아무거나
+  if (!v) v = voices.find(x => x.lang === 'ko-KR' && x.name.toLowerCase().includes('google'));
+  // 5순위: ko-KR 아무거나
+  if (!v) v = voices.find(x => x.lang === 'ko-KR');
+  // 6순위: ko* 아무거나
+  if (!v) v = voices.find(x => x.lang && x.lang.startsWith('ko'));
+  cachedVoice = v || null;
+  return cachedVoice;
+};
+
+const speak = (text, on, opts = {}) => {
+  if (!on || !window.speechSynthesis) return Promise.resolve();
+  return new Promise(resolve => {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text).replace(/[🎉⭐💖🌟🌈🏆🎀🦄🍀🐰😊🥰💝🎊✨]/g, ''));
+    u.lang = 'ko-KR';
+    u.rate = opts.rate ?? 0.95;
+    u.pitch = opts.pitch ?? 1.0;
+    u.volume = opts.volume ?? 1.0;
+    const v = pickKoreanVoice();
+    if (v) u.voice = v;
+    u.onend = resolve;
+    u.onerror = resolve;
+    window.speechSynthesis.speak(u);
+  });
+};
+
+/* ════════════════════════════════════════════════════════════
+   효과음 (스피커 켜졌을 때만)
+   ════════════════════════════════════════════════════════════ */
+const playSound = (type, on) => {
+  if (!on) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    if (type === 'correct') {
+      o.frequency.setValueAtTime(523, ctx.currentTime);
+      o.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      o.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      g.gain.setValueAtTime(0.3, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      o.start(); o.stop(ctx.currentTime + 0.5);
+    } else if (type === 'wrong') {
+      o.frequency.setValueAtTime(392, ctx.currentTime);
+      o.frequency.setValueAtTime(330, ctx.currentTime + 0.15);
+      g.gain.setValueAtTime(0.25, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      o.start(); o.stop(ctx.currentTime + 0.4);
+    } else if (type === 'click') {
+      o.frequency.setValueAtTime(800, ctx.currentTime);
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      o.start(); o.stop(ctx.currentTime + 0.1);
+    } else if (type === 'finish') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const oo = ctx.createOscillator();
+        const gg = ctx.createGain();
+        oo.connect(gg); gg.connect(ctx.destination);
+        oo.frequency.value = f;
+        gg.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.15);
+        gg.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.3);
+        oo.start(ctx.currentTime + i * 0.15);
+        oo.stop(ctx.currentTime + i * 0.15 + 0.3);
+      });
+    }
+  } catch (e) {}
+};
+
+/* ════════════════════════════════════════════════════════════
+   토끼 SVG 마스코트
+   ════════════════════════════════════════════════════════════ */
+const Rabbit = ({ size = 120, mood = 'happy' }) => (
+  <svg viewBox="0 0 200 220" width={size} height={size} xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="70" cy="60" rx="18" ry="38" fill="#fff" stroke="#f9a8d4" strokeWidth="3" className="rabbit-ear-l"/>
+    <ellipse cx="70" cy="60" rx="9" ry="25" fill="#fce7f3"/>
+    <ellipse cx="130" cy="60" rx="18" ry="38" fill="#fff" stroke="#f9a8d4" strokeWidth="3" className="rabbit-ear-r"/>
+    <ellipse cx="130" cy="60" rx="9" ry="25" fill="#fce7f3"/>
+    <ellipse cx="100" cy="140" rx="70" ry="65" fill="#fff" stroke="#f9a8d4" strokeWidth="3"/>
+    <circle cx="75" cy="130" r="9" fill="#1f2937"/>
+    <circle cx="125" cy="130" r="9" fill="#1f2937"/>
+    <circle cx="73" cy="127" r="3" fill="#fff"/>
+    <circle cx="123" cy="127" r="3" fill="#fff"/>
+    <ellipse cx="100" cy="150" rx="6" ry="4" fill="#f472b6"/>
+    {mood === 'happy' && <path d="M 85 160 Q 100 175 115 160" stroke="#1f2937" strokeWidth="3" fill="none" strokeLinecap="round"/>}
+    {mood === 'wow' && <ellipse cx="100" cy="167" rx="8" ry="10" fill="#1f2937"/>}
+    <circle cx="60" cy="155" r="8" fill="#fecaca" opacity="0.6"/>
+    <circle cx="140" cy="155" r="8" fill="#fecaca" opacity="0.6"/>
+  </svg>
+);
+
+/* ════════════════════════════════════════════════════════════
+   메인 앱
+   ════════════════════════════════════════════════════════════ */
+function App() {
+  // 화면 단계
+  const [stage, setStage] = useState('boot'); // boot → intro → name → preRec → places → manners → matching → postRec → reflect → cert
+  // 학생/상태
+  const [student, setStudent] = useState('');
+  const [students, setStudents] = useState(DEFAULT_STUDENTS);
+  const [speakerOn, setSpeakerOn] = useState(false); // 기본 꺼짐
+  const [micGranted, setMicGranted] = useState(false);
+  // 결과 누적
+  const [log, setLog] = useState({
+    preRecord: null,
+    placesVisited: [],
+    peopleQuiz: [],      // {placeId, correct, helpUsed}
+    mannersQuiz: [],     // {qIdx, correct, helpUsed}
+    matchingDone: false,
+    postRecord: null,
+    selfStars: 0,
+    stickers: [],
+    reflection: '',
+    startedAt: new Date().toISOString(),
+  });
+
+  // 부팅 → TTS voices 로드 후 intro로
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (window.speechSynthesis) window.speechSynthesis.getVoices();
+      setStage('intro');
+    }, 500);
+    window.speechSynthesis?.addEventListener?.('voiceschanged', () => {
+      cachedVoice = null; pickKoreanVoice();
+    });
+    return () => clearTimeout(t);
+  }, []);
+
+  // GAS에서 학생명단 로드
+  useEffect(() => {
+    if (!GAS_API_URL) return;
+    fetch(`${GAS_API_URL}?action=getStudents`)
+      .then(r => r.json())
+      .then(d => { if (d?.students?.length) setStudents(d.students); })
+      .catch(() => {});
+  }, []);
+
+  return (
+    <div className="scale-wrap">
+      <div className="scale-inner relative">
+        {/* 상단 컨트롤 */}
+        {stage !== 'boot' && stage !== 'intro' && (
+          <div className="flex justify-between items-center mb-3 px-2">
+            <button
+              onClick={() => { if (confirm('처음 화면으로 돌아갈까요?')) setStage('intro'); }}
+              className="btn bg-white text-gray-700 t-base flex items-center gap-2 px-4 py-2">
+              <Home size={20}/> 처음
+            </button>
+            <button
+              onClick={() => setSpeakerOn(v => !v)}
+              className={`speaker-btn btn flex items-center gap-2 t-base px-4 py-2 ${speakerOn ? 'speaker-on' : 'speaker-off'}`}>
+              {speakerOn ? <Volume2 size={22}/> : <VolumeX size={22}/>}
+              {speakerOn ? '소리 켬' : '소리 꺼짐'}
+            </button>
+          </div>
+        )}
+
+        <AnimatePresence mode="wait">
+          {stage === 'boot' && <Boot key="boot"/>}
+          {stage === 'intro' && <Intro key="intro" onNext={() => setStage('name')} speakerOn={speakerOn} setSpeakerOn={setSpeakerOn} micGranted={micGranted} setMicGranted={setMicGranted}/>}
+          {stage === 'name' && <NameSelect key="name" students={students} onPick={n => { setStudent(n); setStage('preRec'); }} speakerOn={speakerOn}/>}
+          {stage === 'preRec' && <RecordScreen key="preRec" title="🌱 시작하는 다짐 녹음" prompt="우리 학교에는 어떤 사람들이 계실까요? 어떤 마음으로 만나고 싶나요?" examples={['우리 학교에 누가 계신지 궁금해요.', '예의 바른 친구가 되고 싶어요.']} student={student} speakerOn={speakerOn} onDone={data => { setLog(l => ({...l, preRecord: data})); setStage('places'); }}/>}
+          {stage === 'places' && <PlacesActivity key="places" speakerOn={speakerOn} log={log} setLog={setLog} onDone={() => setStage('manners')}/>}
+          {stage === 'manners' && <MannersActivity key="manners" speakerOn={speakerOn} log={log} setLog={setLog} onDone={() => setStage('matching')}/>}
+          {stage === 'matching' && <MatchingActivity key="matching" speakerOn={speakerOn} onDone={() => { setLog(l => ({...l, matchingDone: true})); setStage('postRec'); }}/>}
+          {stage === 'postRec' && <RecordScreen key="postRec" title="🌟 마지막 다짐 녹음" prompt="오늘 배운 내용으로 새로 만든 나의 다짐을 말해보세요!" examples={['우리 학교 사람들께 예의를 지킬 거예요.', '도서관에서는 소곤소곤 말할 거예요.', '선생님을 만나면 먼저 인사할 거예요.']} student={student} speakerOn={speakerOn} showSelfEval onDone={data => { setLog(l => ({...l, postRecord: data, selfStars: data.stars || 0, stickers: data.stickers || []})); setStage('reflect'); }}/>}
+          {stage === 'reflect' && <Reflection key="reflect" speakerOn={speakerOn} onDone={text => { setLog(l => ({...l, reflection: text})); setStage('cert'); }}/>}
+          {stage === 'cert' && <Certificate key="cert" student={student} log={log} speakerOn={speakerOn} onRestart={() => { setStage('intro'); setStudent(''); setLog({preRecord:null, placesVisited:[], peopleQuiz:[], mannersQuiz:[], matchingDone:false, postRecord:null, selfStars:0, stickers:[], reflection:'', startedAt: new Date().toISOString()}); }}/>}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   부팅 화면
+   ════════════════════════════════════════════════════════════ */
+function Boot() {
+  return (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} className="flex flex-col items-center justify-center min-h-[80vh]">
+      <div className="hop"><Rabbit size={180}/></div>
+      <p className="font-jua t-lg text-pink-600 mt-6">학교 사람 탐험대 준비중...</p>
+    </motion.div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   시작 화면 — 마이크 권한 1회 + 스피커 토글
+   ════════════════════════════════════════════════════════════ */
+function Intro({ onNext, speakerOn, setSpeakerOn, micGranted, setMicGranted }) {
+  const [asking, setAsking] = useState(false);
+
+  const askMic = async () => {
+    setAsking(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(t => t.stop());
+      setMicGranted(true);
+    } catch (e) {
+      setMicGranted(false);
+      alert('마이크를 사용할 수 없어요. 키보드로 입력하셔도 활동을 끝까지 할 수 있어요!');
+      // 마이크 거부해도 진행 가능 (키보드 입력 대체)
+    }
+    setAsking(false);
+  };
+
+  return (
+    <motion.div key="intro" initial={{opacity:0, scale:0.96}} animate={{opacity:1, scale:1}} exit={{opacity:0}} className="card p-7 sm:p-10 mt-3">
+      <div className="text-center mb-6">
+        <div className="hop inline-block"><Rabbit size={170}/></div>
+        <h1 className="font-jua t-hero text-pink-600 mt-3">학교 사람 탐험대</h1>
+        <p className="font-gaegu t-h2 text-purple-700 mt-2">🐰 토끼와 함께 학교 사람들을 만나봐요!</p>
+        <p className="font-do t-md text-gray-500 mt-1">통합교과 1~2학년군 · 사람알기 · 예절</p>
+      </div>
+
+      {/* 단계별 안내 */}
+      <div className="bg-yellow-50 rounded-3xl p-5 mb-5">
+        <p className="font-jua t-lg text-amber-800 mb-3">📍 오늘 할 일</p>
+        <div className="space-y-2 font-gaegu t-md text-gray-700">
+          <div>1️⃣ 학교 사람 도감 탐험 (어떤 분이 계실까?)</div>
+          <div>2️⃣ 예절 상황 미션 (이럴 땐 어떻게?)</div>
+          <div>3️⃣ 사람-장소 짝짓기 놀이</div>
+          <div>4️⃣ 다짐 녹음 + 칭찬 스티커</div>
+        </div>
+      </div>
+
+      {/* 시작 전 준비 */}
+      <div className="space-y-3">
+        <div className="bg-blue-50 rounded-3xl p-5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <p className="font-jua t-md text-blue-800">🎤 마이크 준비</p>
+              <p className="font-gaegu t-sm text-gray-600">앱 시작할 때 한 번만 허용하면 돼요</p>
             </div>
-        );
+            {micGranted ? (
+              <span className="bg-emerald-500 text-white rounded-2xl px-4 py-2 font-jua t-base flex items-center gap-1"><Check size={20}/> 사용 가능</span>
+            ) : (
+              <button onClick={askMic} disabled={asking} className="btn bg-blue-500 text-white font-jua t-base">
+                {asking ? '확인중...' : '마이크 허용하기'}
+              </button>
+            )}
+          </div>
+          <p className="font-gaegu t-sm text-gray-500 mt-2">💡 마이크가 없거나 막혀도, 키보드로 입력해서 활동할 수 있어요!</p>
+        </div>
 
+        <div className="bg-green-50 rounded-3xl p-5">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <p className="font-jua t-md text-green-800">🔊 소리 설정</p>
+              <p className="font-gaegu t-sm text-gray-600">켜면 문제를 읽어주고 효과음도 나와요</p>
+            </div>
+            <button onClick={() => setSpeakerOn(v => !v)} className={`btn font-jua t-base flex items-center gap-2 ${speakerOn ? 'speaker-on' : 'speaker-off'}`}>
+              {speakerOn ? <Volume2 size={22}/> : <VolumeX size={22}/>}
+              {speakerOn ? '켜짐' : '꺼짐'}
+            </button>
+          </div>
+        </div>
+      </div>
 
-        // --- 사운드 관리 ---
-        const playSound = (type, isMuted) => {
-            if (isMuted) return;
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
+      <button onClick={onNext} className="btn w-full mt-6 bg-gradient-to-r from-pink-400 to-purple-500 text-white font-jua t-h2 py-5 pulse-glow">
+        🐰 토끼와 함께 출발! →
+      </button>
+    </motion.div>
+  );
+}
 
-            if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.5);
-            } else if (type === 'wrong') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.3);
-            }
+/* ════════════════════════════════════════════════════════════
+   학생 이름 선택 — 드롭다운
+   ════════════════════════════════════════════════════════════ */
+function NameSelect({ students, onPick, speakerOn }) {
+  const [v, setV] = useState('');
+  useEffect(() => { speak('이름을 골라주세요.', speakerOn); }, []);
+  return (
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="card p-7 sm:p-10 mt-3">
+      <div className="text-center mb-6">
+        <div className="wiggle inline-block"><Rabbit size={130}/></div>
+        <h1 className="font-jua t-hero text-purple-600 mt-3">누구인가요?</h1>
+        <p className="font-gaegu t-h2 text-pink-600 mt-2">친구의 이름을 골라주세요!</p>
+      </div>
+      <select value={v} onChange={e => setV(e.target.value)} className="w-full font-jua t-h2 rounded-3xl p-5 border-4 border-purple-200 bg-white text-center text-purple-800 mb-5 shadow-lg" style={{appearance:'none', backgroundImage:'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2730%27%20height%3D%2730%27%20viewBox%3D%270%200%2030%2030%27%3E%3Cpath%20fill%3D%27%23a78bfa%27%20d%3D%27M15%2020l-7-7h14z%27%2F%3E%3C%2Fsvg%3E")', backgroundRepeat:'no-repeat', backgroundPosition:'right 18px center', paddingRight:'60px'}}>
+        <option value="">— 이름 선택 —</option>
+        {students.map(s => <option key={s} value={s}>{s}</option>)}
+      </select>
+      <button disabled={!v} onClick={() => onPick(v)} className={`btn w-full font-jua t-h2 py-5 ${v ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white pulse-glow' : 'bg-gray-200 text-gray-400'}`}>
+        시작할게요! →
+      </button>
+      <p className="font-gaegu t-sm text-gray-400 text-center mt-4">💡 선생님께서 구글 시트에서 학생 명단을 직접 수정할 수 있어요</p>
+    </motion.div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   녹음 화면 (사전/사후 공통) — STT + 키보드 + 듣기 + 별점
+   ════════════════════════════════════════════════════════════ */
+function RecordScreen({ title, prompt, examples = [], student, speakerOn, onDone, showSelfEval = false }) {
+  const [recording, setRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [audioURL, setAudioURL] = useState('');
+  const [mode, setMode] = useState('voice'); // voice | keyboard
+  const [helpUsed, setHelpUsed] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [stars, setStars] = useState(0);
+  const [stickers, setStickers] = useState([]);
+  const [phase, setPhase] = useState('record'); // record → review → eval(if selfEval) → done
+  const recRef = useRef(null);
+  const sttRef = useRef(null);
+  const chunksRef = useRef([]);
+
+  useEffect(() => {
+    speak(prompt, speakerOn);
+  }, []);
+
+  const startRec = async () => {
+    setTranscript(''); setAudioBlob(null); setAudioURL(''); chunksRef.current = [];
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      recRef.current = rec;
+      rec.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+      rec.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(blob);
+        setAudioURL(URL.createObjectURL(blob));
+        stream.getTracks().forEach(t => t.stop());
+      };
+      rec.start();
+
+      // STT 실시간
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) {
+        const stt = new SR();
+        stt.lang = 'ko-KR'; stt.continuous = true; stt.interimResults = true;
+        let finalT = '';
+        stt.onresult = e => {
+          let interim = '';
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            if (e.results[i].isFinal) finalT += e.results[i][0].transcript + ' ';
+            else interim += e.results[i][0].transcript;
+          }
+          setTranscript(finalT + interim);
         };
+        stt.onerror = () => {};
+        sttRef.current = stt;
+        stt.start();
+      }
+      setRecording(true);
+    } catch (e) {
+      alert('마이크를 쓸 수 없어요. 키보드로 입력해 주세요!');
+      setMode('keyboard');
+    }
+  };
 
-        const App = () => {
-            // 아래에 선생님의 구글 앱스 스크립트 웹 앱 URL을 붙여넣으세요!
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbwEqZ2wN23-lg4eQ-Ckt4ouGFD7DGMGksrYMCwYf6ntWabQrUH3bj-Wqn7mmvw9PbzZ/exec";
+  const stopRec = () => {
+    try { recRef.current?.stop(); } catch {}
+    try { sttRef.current?.stop(); } catch {}
+    setRecording(false);
+    setPhase('review');
+  };
 
-            const [gasUrl] = useState(GAS_URL);
-            const [isMuted, setIsMuted] = useState(true);
-            const [micAllowed, setMicAllowed] = useState(false);
-            const [phase, setPhase] = useState('loading'); // loading, error, perm, login, intro, prerecord, dictionary, explore, etiquette, postrecord, eval, reward
-            const [students, setStudents] = useState([]);
-            const [places, setPlaces] = useState([]);
-            const [etiquette, setEtiquette] = useState([]);
+  const playBack = () => {
+    if (mode === 'keyboard') {
+      speak(transcript || '아직 입력한 내용이 없어요.', true);
+    } else if (audioURL) {
+      const a = new Audio(audioURL);
+      a.play();
+    }
+  };
 
-            const [studentName, setStudentName] = useState('');
-            const [isLoading, setIsLoading] = useState(false);
-            const [loadingMsg, setLoadingMsg] = useState('');
-            const [errorMsg, setErrorMsg] = useState('');
+  const useHelp = () => {
+    if (!helpUsed) setHelpUsed(true);
+    setShowHelp(true);
+    if (examples.length) speak(examples[0], speakerOn || true); // 도움받기는 강제로 읽어줌
+  };
 
-            // 로깅 및 데이터 저장용 상태
-            const [preAudioText, setPreAudioText] = useState('');
-            const [preAudioBase64, setPreAudioBase64] = useState('');
-            const [preAudioMimeType, setPreAudioMimeType] = useState('');
+  const finish = () => {
+    onDone({
+      transcript: transcript.trim(),
+      audioBlob,
+      mode,
+      helpUsed,
+      stars,
+      stickers,
+    });
+  };
 
-            const [postAudioText, setPostAudioText] = useState('');
-            const [postAudioBase64, setPostAudioBase64] = useState('');
-            const [postAudioMimeType, setPostAudioMimeType] = useState('');
+  const toggleSticker = (s) => {
+    setStickers(arr => arr.includes(s.emoji) ? arr.filter(x => x !== s.emoji) : [...arr, s.emoji]);
+  };
 
-            const [wrongPlaces, setWrongPlaces] = useState([]);
-            const [wrongEtiquette, setWrongEtiquette] = useState([]);
-            const [stars, setStars] = useState(0);
+  return (
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="card p-6 sm:p-8 mt-3">
+      <div className="text-center mb-4">
+        <h2 className="font-jua t-h1 text-pink-600">{title}</h2>
+        <p className="font-gaegu t-lg text-purple-700 mt-2 px-3">{prompt}</p>
+      </div>
 
-            // 단계별 인덱스
-            const [currentPlaceIdx, setCurrentPlaceIdx] = useState(0);
-            const [exploredPlaces, setExploredPlaces] = useState([]);
-            const [currentEtiquetteIdx, setCurrentEtiquetteIdx] = useState(0);
+      {/* 도움받기 박스 */}
+      {showHelp && (
+        <motion.div initial={{opacity:0, height:0}} animate={{opacity:1, height:'auto'}} className="bg-purple-50 rounded-3xl p-5 mb-4">
+          <p className="font-jua t-md text-purple-800 mb-2">💜 이렇게 말해볼까요?</p>
+          <div className="space-y-2">
+            {examples.map((ex, i) => (
+              <div key={i} className="bg-white rounded-2xl p-3 font-gaegu t-md text-gray-700 flex justify-between items-center gap-2">
+                <span>"{ex}"</span>
+                <button onClick={() => speak(ex, true)} className="bg-purple-400 text-white rounded-full p-2"><Volume2 size={18}/></button>
+              </div>
+            ))}
+          </div>
+          <p className="font-gaegu t-sm text-purple-600 mt-3">✓ 도움 사용 기록됨</p>
+        </motion.div>
+      )}
 
-            const [feedback, setFeedback] = useState(null);
+      {phase === 'record' && (
+        <>
+          {/* 입력 모드 토글 */}
+          <div className="flex gap-2 mb-4 justify-center">
+            <button onClick={() => setMode('voice')} className={`btn t-base flex items-center gap-2 ${mode==='voice'?'bg-pink-400 text-white':'bg-gray-100 text-gray-600'}`}>
+              <Mic size={20}/> 목소리로
+            </button>
+            <button onClick={() => setMode('keyboard')} className={`btn t-base flex items-center gap-2 ${mode==='keyboard'?'bg-purple-400 text-white':'bg-gray-100 text-gray-600'}`}>
+              <Keyboard size={20}/> 키보드로
+            </button>
+          </div>
 
-            // 음성 인식 관련
-            const [isRecording, setIsRecording] = useState(false);
-            const mediaRecorderRef = useRef(null);
-            const audioChunksRef = useRef([]);
-            const recognitionRef = useRef(null);
+          {/* 녹음 영역 */}
+          {mode === 'voice' && (
+            <div className="text-center">
+              {!recording ? (
+                <button onClick={startRec} className="btn bg-gradient-to-r from-pink-500 to-rose-500 text-white font-jua t-h2 px-8 py-6 pulse-glow inline-flex items-center gap-3">
+                  <Mic size={32}/> 녹음 시작!
+                </button>
+              ) : (
+                <button onClick={stopRec} className="btn bg-red-500 text-white font-jua t-h2 px-8 py-6 blink inline-flex items-center gap-3">
+                  <Pause size={32}/> 녹음 끝!
+                </button>
+              )}
+              <p className="font-gaegu t-sm text-gray-500 mt-3">
+                {recording ? '🎙️ 듣고 있어요... 말이 끝나면 "녹음 끝!"을 눌러요' : '버튼 아래에 안내가 있어요. 천천히 또박또박 말해주세요!'}
+              </p>
 
-            // 음성 출력
-            const speak = (text) => {
-                if (isMuted || !window.speechSynthesis) return;
-                window.speechSynthesis.cancel();
-                const utterThis = new SpeechSynthesisUtterance(text);
-                const voices = window.speechSynthesis.getVoices();
-                const googleVoice = voices.find(v => v.name.includes('Google') && v.lang === 'ko-KR');
-                if (googleVoice) {
-                    utterThis.voice = googleVoice;
-                }
-                utterThis.rate = 0.9;
-                utterThis.pitch = 1.1;
-                utterThis.lang = 'ko-KR';
-                window.speechSynthesis.speak(utterThis);
-            };
-
-            // 데이터 불러오기
-            const fetchData = async (url) => {
-                setIsLoading(true); setLoadingMsg("학교 데이터를 불러오고 있어요..."); setErrorMsg('');
-                try {
-                    const res = await fetch(url);
-                    const data = await res.json();
-                    if (data.success) {
-                        setStudents(data.students || []);
-                        setPlaces(data.places || []);
-                        setEtiquette(data.etiquette || []);
-                        setPhase('perm'); // 데이터 로드 후 마이크 권한 요청
-                    } else {
-                        setErrorMsg("데이터를 불러오는데 실패했어요. URL을 확인해주세요.");
-                        setPhase('error');
-                    }
-                } catch (e) {
-                    setErrorMsg("네트워크 오류가 발생했어요. 앱스 스크립트 URL이 맞는지 확인해주세요.");
-                    setPhase('error');
-                }
-                setIsLoading(false);
-            };
-
-            // 처음에 자동으로 데이터 불러오기
-            useEffect(() => {
-                if (GAS_URL && GAS_URL !== "여기에_배포한_앱스스크립트_URL을_붙여넣으세요") {
-                    fetchData(GAS_URL);
-                } else {
-                    setErrorMsg("index.html 파일 코드 상단의 GAS_URL 변수에 주소를 입력해주세요!");
-                    setPhase('error');
-                }
-            }, []);
-
-            // 마이크 권한 요청
-            const requestMicPermission = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    stream.getTracks().forEach(t => t.stop()); // 권한만 얻고 바로 해제
-                    setMicAllowed(true);
-                    setPhase('login');
-                } catch (e) {
-                    setMicAllowed(false);
-                    setPhase('login'); // 거부해도 진행(녹음 기능만 비활성화)
-                }
-            };
-
-            // 녹음 시작
-            const startRecording = async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    const options = { mimeType: 'audio/webm' };
-                    const recorder = new MediaRecorder(stream, options);
-                    mediaRecorderRef.current = recorder;
-                    audioChunksRef.current = [];
-
-                    recorder.ondataavailable = (e) => {
-                        if (e.data.size > 0) audioChunksRef.current.push(e.data);
-                    };
-
-                    recorder.onstop = () => {
-                        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-                        const reader = new FileReader();
-                        reader.readAsDataURL(blob);
-                        reader.onloadend = () => {
-                            const base64data = reader.result.split(',')[1];
-                            if (phase === 'prerecord') {
-                                setPreAudioBase64(base64data);
-                                setPreAudioMimeType('audio/webm');
-                            } else if (phase === 'postrecord') {
-                                setPostAudioBase64(base64data);
-                                setPostAudioMimeType('audio/webm');
-                            }
-                        };
-                    };
-
-                    // 음성 인식 시작 (STT)
-                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                    if (SpeechRecognition) {
-                        const recognition = new SpeechRecognition();
-                        recognition.lang = 'ko-KR';
-                        recognition.continuous = true;
-                        recognition.interimResults = true;
-
-                        let finalTranscript = '';
-                        recognition.onresult = (e) => {
-                            let interimTranscript = '';
-                            for (let i = e.resultIndex; i < e.results.length; ++i) {
-                                if (e.results[i].isFinal) {
-                                    finalTranscript += e.results[i][0].transcript + ' ';
-                                } else {
-                                    interimTranscript += e.results[i][0].transcript;
-                                }
-                            }
-                            if (phase === 'prerecord') {
-                                setPreAudioText(finalTranscript + interimTranscript);
-                            } else if (phase === 'postrecord') {
-                                setPostAudioText(finalTranscript + interimTranscript);
-                            }
-                        };
-                        recognitionRef.current = recognition;
-                        recognition.start();
-                    }
-
-                    recorder.start();
-                    setIsRecording(true);
-                } catch (err) {
-                    alert("마이크 사용 권한이 필요해요!");
-                }
-            };
-
-            const stopRecording = () => {
-                if (mediaRecorderRef.current && isRecording) {
-                    mediaRecorderRef.current.stop();
-                    mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-                }
-                if (recognitionRef.current) {
-                    recognitionRef.current.stop();
-                }
-                setIsRecording(false);
-            };
-
-            // 결과 제출
-            const submitResults = async (finalStars) => {
-                setIsLoading(true); setLoadingMsg("학습 결과를 저장하고 있어요...");
-                try {
-                    const payload = {
-                        action: "saveResult",
-                        studentName,
-                        preAudioBase64, preAudioMimeType, preAudioText,
-                        postAudioBase64, postAudioMimeType, postAudioText,
-                        stars: finalStars,
-                        wrongPlaces,
-                        wrongEtiquette
-                    };
-
-                    await fetch(gasUrl, {
-                        method: "POST",
-                        body: JSON.stringify(payload)
-                    });
-                    setPhase('reward');
-                } catch (e) {
-                    alert("결과 저장 중 오류가 발생했습니다.");
-                    setPhase('reward');
-                }
-                setIsLoading(false);
-            };
-
-            const handleStarClick = (s) => {
-                setStars(s);
-                if (s <= 3) {
-                    // 3점 이하면 재도전 버튼을 보여줌 (상태 변경 없이 eval 화면 유지)
-                } else {
-                    submitResults(s);
-                }
-            };
-
-            // TopBar
-            const TopBar = () => (
-                <div className="v-top-bar">
-                    <button onClick={() => setIsMuted(!isMuted)} className={`v-top-btn ${isMuted ? 'bg-gray-100' : 'bg-green-100'}`}>
-                        {isMuted ? '🔇' : '🔊'}
-                    </button>
+              {/* 실시간 STT 표시 */}
+              {(recording || transcript) && (
+                <div className="bg-yellow-50 rounded-3xl p-4 mt-4 min-h-[80px]">
+                  <p className="font-jua t-sm text-amber-700 mb-1">📝 실시간 받아쓰기</p>
+                  <p className="font-gaegu t-lg text-gray-800">{transcript || '...'}</p>
                 </div>
+              )}
+            </div>
+          )}
+
+          {mode === 'keyboard' && (
+            <div>
+              <textarea
+                value={transcript}
+                onChange={e => setTranscript(e.target.value)}
+                placeholder="여기에 다짐을 적어주세요..."
+                className="w-full font-gaegu t-lg p-4 rounded-3xl border-4 border-purple-200 min-h-[120px] focus:border-purple-500 focus:outline-none"
+              />
+              <button onClick={() => setPhase('review')} disabled={!transcript.trim()} className={`btn w-full mt-3 font-jua t-lg py-4 ${transcript.trim() ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                입력 완료! →
+              </button>
+            </div>
+          )}
+
+          {/* 도움받기 / 건너뛰기 */}
+          <div className="flex gap-2 mt-5">
+            <button onClick={useHelp} className="btn flex-1 bg-purple-200 text-purple-800 font-jua t-base flex items-center justify-center gap-2">
+              <HelpCircle size={20}/> 💜 도움받기
+            </button>
+            <button onClick={() => onDone({ transcript:'', audioBlob:null, mode:'skip', helpUsed, stars:0, stickers:[] })} className="btn bg-gray-200 text-gray-600 font-jua t-base">
+              건너뛰기
+            </button>
+          </div>
+        </>
+      )}
+
+      {phase === 'review' && (
+        <div className="text-center">
+          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-5 mb-4">
+            <p className="font-jua t-md text-amber-800 mb-2">📝 내가 한 말</p>
+            <p className="font-gaegu t-lg text-gray-800">"{transcript || '(녹음 내용 확인중...)'}"</p>
+          </div>
+          <div className="flex gap-2 justify-center flex-wrap mb-4">
+            <button onClick={playBack} className="btn bg-blue-400 text-white font-jua t-base flex items-center gap-2">
+              <Play size={20}/> 다시 들어보기
+            </button>
+            <button onClick={() => { setPhase('record'); setTranscript(''); setAudioBlob(null); setAudioURL(''); }} className="btn bg-orange-400 text-white font-jua t-base flex items-center gap-2">
+              <RotateCcw size={20}/> 다시 녹음
+            </button>
+          </div>
+          {showSelfEval ? (
+            <button onClick={() => setPhase('eval')} className="btn w-full bg-gradient-to-r from-pink-400 to-purple-500 text-white font-jua t-h2 py-5">
+              내 다짐 평가하기 → ⭐
+            </button>
+          ) : (
+            <button onClick={finish} className="btn w-full bg-gradient-to-r from-emerald-400 to-green-500 text-white font-jua t-h2 py-5">
+              좋아요, 다음으로 →
+            </button>
+          )}
+        </div>
+      )}
+
+      {phase === 'eval' && (
+        <div className="text-center">
+          <p className="font-jua t-h2 text-purple-700 mb-3">⭐ 내 다짐을 별로 평가해볼까요?</p>
+          <p className="font-gaegu t-md text-gray-600 mb-4">내가 들어봤을 때 어땠나요?</p>
+          <div className="flex justify-center gap-1 mb-5">
+            {[1,2,3,4,5].map(n => (
+              <span key={n} onClick={() => { setStars(n); playSound('click', speakerOn); }} className={`star ${n <= stars ? 'star-on' : 'star-off'}`}>★</span>
+            ))}
+          </div>
+          {stars > 0 && stars <= 3 && (
+            <div className="bg-orange-50 rounded-3xl p-4 mb-4">
+              <p className="font-jua t-md text-orange-700">🌱 한 번 더 해볼까요?</p>
+              <p className="font-gaegu t-sm text-gray-600 mt-1">조금 더 자신있게 말해보면 좋아요!</p>
+              <button onClick={() => { setPhase('record'); setTranscript(''); setAudioBlob(null); setStars(0); setStickers([]); }} className="btn bg-orange-400 text-white font-jua t-base mt-3">
+                <RotateCcw size={18} className="inline mr-1"/> 다시 녹음하기
+              </button>
+            </div>
+          )}
+          {stars >= 4 && (
+            <div className="bg-emerald-50 rounded-3xl p-4 mb-4">
+              <p className="font-jua t-md text-emerald-700">🎉 정말 멋진 다짐이에요!</p>
+              <button onClick={() => { setPhase('record'); setTranscript(''); setAudioBlob(null); setStars(0); setStickers([]); }} className="btn bg-orange-300 text-orange-800 font-jua t-sm mt-2">
+                다시 녹음할래요
+              </button>
+            </div>
+          )}
+
+          {/* 칭찬 스티커 */}
+          {stars >= 1 && (
+            <div className="mt-4">
+              <p className="font-jua t-md text-pink-700 mb-2">🎁 나에게 칭찬 스티커 주기!</p>
+              <div className="grid grid-cols-5 gap-2">
+                {STICKERS.map(s => (
+                  <button key={s.emoji} onClick={() => toggleSticker(s)} className={`rounded-2xl p-2 text-3xl ${stickers.includes(s.emoji) ? 'bg-yellow-200 ring-4 ring-yellow-400' : 'bg-gray-50'}`}>
+                    {s.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <button disabled={stars === 0} onClick={finish} className={`btn w-full font-jua t-h2 py-5 mt-5 ${stars > 0 ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white pulse-glow' : 'bg-gray-200 text-gray-400'}`}>
+            {stars > 0 ? '다음으로 →' : '별점을 선택해주세요'}
+          </button>
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   활동 1 — 학교 사람 도감 (장소 클릭 → 누가 있을까? 퀴즈)
+   ════════════════════════════════════════════════════════════ */
+function PlacesActivity({ speakerOn, log, setLog, onDone }) {
+  const [currentPlace, setCurrentPlace] = useState(null);
+  const visited = log.placesVisited;
+
+  useEffect(() => { speak('학교 지도에서 가고 싶은 곳을 골라보세요!', speakerOn); }, []);
+
+  const allDone = visited.length >= PLACES.length;
+
+  if (currentPlace) {
+    return <PlaceQuiz place={currentPlace} speakerOn={speakerOn} onBack={(result) => {
+      setLog(l => ({
+        ...l,
+        placesVisited: l.placesVisited.includes(currentPlace.id) ? l.placesVisited : [...l.placesVisited, currentPlace.id],
+        peopleQuiz: [...l.peopleQuiz, { placeId: currentPlace.id, correct: result.correct, helpUsed: result.helpUsed }]
+      }));
+      setCurrentPlace(null);
+    }}/>;
+  }
+
+  return (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="card p-6 sm:p-8 mt-3">
+      <div className="text-center mb-5">
+        <h2 className="font-jua t-h1 text-pink-600">🗺️ 학교 사람 도감</h2>
+        <p className="font-gaegu t-lg text-purple-700 mt-2">장소를 눌러서 누가 계신지 알아봐요!</p>
+        <p className="font-gaegu t-sm text-gray-500 mt-1">({visited.length} / {PLACES.length} 곳 방문)</p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+        {PLACES.map(p => {
+          const done = visited.includes(p.id);
+          return (
+            <motion.button
+              key={p.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => { playSound('click', speakerOn); setCurrentPlace(p); }}
+              className={`card-hover rounded-3xl p-4 text-center relative ${done ? 'bg-emerald-50 ring-4 ring-emerald-300' : 'bg-white'}`}
+              style={{ borderTop: `6px solid ${p.color}` }}>
+              <div className="text-5xl float">{p.emoji}</div>
+              <div className="font-jua t-md mt-2 text-gray-800">{p.name}</div>
+              {done && <div className="absolute top-2 right-2 bg-emerald-500 text-white rounded-full w-7 h-7 flex items-center justify-center"><Check size={18}/></div>}
+            </motion.button>
+          );
+        })}
+      </div>
+
+      <button disabled={!allDone} onClick={() => { playSound('finish', speakerOn); onDone(); }} className={`btn w-full font-jua t-h2 py-5 ${allDone ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white pulse-glow' : 'bg-gray-200 text-gray-400'}`}>
+        {allDone ? '🌟 다음 활동으로! →' : `모든 곳 다 가보기 (${PLACES.length - visited.length}곳 남음)`}
+      </button>
+    </motion.div>
+  );
+}
+
+function PlaceQuiz({ place, speakerOn, onBack }) {
+  const quiz = PEOPLE_QUIZ[place.id];
+  const [phase, setPhase] = useState('intro'); // intro → quiz → done
+  const [picked, setPicked] = useState(-1);
+  const [helpUsed, setHelpUsed] = useState(false);
+  const [showFb, setShowFb] = useState(false);
+
+  // 보기 순서 셔플 (정답 위치 무작위)
+  const shuffled = useMemo(() => {
+    const arr = quiz.opts.map((t, i) => ({ t, i }));
+    for (let j = arr.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [arr[j], arr[k]] = [arr[k], arr[j]];
+    }
+    return arr;
+  }, [place.id]);
+
+  useEffect(() => { speak(`${place.name}에 오신 것을 환영해요!`, speakerOn); }, []);
+
+  const pick = (origIdx) => {
+    setPicked(origIdx);
+    const correct = origIdx === quiz.ans;
+    setShowFb(true);
+    playSound(correct ? 'correct' : 'wrong', speakerOn);
+    speak(correct ? quiz.fb : '다시 한번 생각해볼까요?', speakerOn);
+    setTimeout(() => {
+      if (correct) {
+        setPhase('done');
+      } else {
+        setShowFb(false); setPicked(-1);
+      }
+    }, 2500);
+  };
+
+  if (phase === 'intro') {
+    return (
+      <motion.div initial={{opacity:0, scale:0.95}} animate={{opacity:1, scale:1}} className="card p-6 sm:p-8 mt-3">
+        <div className="text-center mb-5">
+          <div className="text-7xl mb-2 hop">{place.emoji}</div>
+          <h2 className="font-jua t-h1" style={{color: place.color}}>{place.name}</h2>
+          <p className="font-gaegu t-lg text-gray-700 mt-2">{place.desc}</p>
+        </div>
+        <div className="bg-yellow-50 rounded-3xl p-5 mb-5">
+          <p className="font-jua t-md text-amber-800 mb-3">🌟 여기 계신 분</p>
+          {place.people.map((per, i) => (
+            <div key={i} className="bg-white rounded-2xl p-3 mb-2 flex items-center gap-3">
+              <span className="text-4xl">{per.emoji}</span>
+              <div>
+                <div className="font-jua t-md text-gray-800">{per.name}</div>
+                <div className="font-gaegu t-sm text-gray-600">{per.job}</div>
+              </div>
+              <button onClick={() => speak(`${per.name}은 ${per.job}`, true)} className="ml-auto bg-purple-300 rounded-full p-2"><Volume2 size={16} className="text-white"/></button>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => setPhase('quiz')} className="btn w-full bg-gradient-to-r from-pink-400 to-purple-500 text-white font-jua t-h2 py-5">
+          이제 퀴즈! 🎯
+        </button>
+        <p className="font-gaegu t-sm text-gray-400 text-center mt-2">버튼 바로 위에 있는 사람을 잘 살펴봤어요?</p>
+      </motion.div>
+    );
+  }
+
+  if (phase === 'quiz') {
+    return (
+      <motion.div initial={{opacity:0}} animate={{opacity:1}} className="card p-6 sm:p-8 mt-3">
+        <div className="text-center mb-5">
+          <div className="text-6xl mb-2">{place.emoji}</div>
+          <h2 className="font-jua t-h2 text-gray-800">{quiz.q}</h2>
+          <button onClick={() => speak(quiz.q, true)} className="mt-2 bg-purple-300 rounded-full p-2 inline-block"><Volume2 size={18} className="text-white"/></button>
+        </div>
+
+        <div className="space-y-3 mb-4">
+          {shuffled.map(({ t, i }) => {
+            const isPicked = picked === i;
+            const isCorrect = i === quiz.ans;
+            const reveal = showFb && isPicked;
+            return (
+              <motion.button
+                key={i}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                disabled={showFb}
+                onClick={() => pick(i)}
+                className={`w-full text-left rounded-3xl p-5 font-gaegu t-lg border-4 transition-all ${reveal ? (isCorrect ? 'bg-emerald-100 border-emerald-500' : 'bg-orange-100 border-orange-400') : 'bg-white border-gray-200 hover:border-purple-400'}`}>
+                <span className="inline-block w-9 h-9 rounded-full bg-purple-200 text-purple-700 font-jua text-center leading-9 mr-3">{String.fromCharCode(65+shuffled.indexOf({t,i}) === -1 ? 65 : 65)}</span>
+                {t}
+                {reveal && isCorrect && <Check className="inline ml-2 text-emerald-600" size={26}/>}
+                {reveal && !isCorrect && <X className="inline ml-2 text-orange-500" size={26}/>}
+              </motion.button>
             );
+          })}
+        </div>
 
-            // 1. Loading
-            if (phase === 'loading') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center'}}>
-                    <RabbitCharacter />
-                    <div className="spin" style={{fontSize:'5vmin',marginTop:'2vmin'}}>⏳</div>
-                    <p className="v-h2" style={{color:'#15803d',marginTop:'2vmin'}}>{loadingMsg || '앱을 준비하는 중...'}</p>
-                </div>
-            );
+        {showFb && picked === quiz.ans && (
+          <motion.div initial={{scale:0.5}} animate={{scale:1}} className="bg-emerald-50 rounded-3xl p-4 mb-3 text-center">
+            <p className="font-jua t-lg text-emerald-700 whitespace-pre-line">{quiz.fb}</p>
+          </motion.div>
+        )}
+        {showFb && picked !== quiz.ans && (
+          <motion.div initial={{scale:0.5}} animate={{scale:1}} className="bg-orange-50 rounded-3xl p-4 mb-3 text-center">
+            <p className="font-jua t-md text-orange-700">아쉬워요!\n다시 한번 살펴봐요 💪</p>
+          </motion.div>
+        )}
 
-            // Error
-            if (phase === 'error') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center'}}>
-                    <RabbitCharacter />
-                    <p className="v-h2" style={{color:'#ef4444',marginTop:'2vmin'}}>앗, 설정이 필요해요!</p>
-                    <p className="v-body" style={{color:'#6b7280',marginTop:'1vmin',maxWidth:'70vmin'}}>{errorMsg}</p>
-                </div>
-            );
+        <button onClick={() => { if (!helpUsed) setHelpUsed(true); speak(`${place.people[0].name}을 기억해보세요. ${place.people[0].job}이에요.`, true); }} className="btn w-full bg-purple-200 text-purple-800 font-jua t-base flex items-center justify-center gap-2">
+          <HelpCircle size={20}/> 💜 도움받기
+        </button>
+      </motion.div>
+    );
+  }
 
-            // Mic Permission
-            if (phase === 'perm') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'3vmin'}}>
-                    <RabbitCharacter />
-                    <div className="v-card" style={{textAlign:'center'}}>
-                        <div style={{fontSize:'8vmin'}}>🎤</div>
-                        <p className="v-h2" style={{color:'#15803d',margin:'2vmin 0 1vmin'}}>마이크 사용 필요해요!</p>
-                        <p className="v-body" style={{color:'#6b7280',marginBottom:'3vmin'}}>이 앱은 학습 전후 말하기를 녹음해요.<br/>마이크 사용을 허락해 주세요.</p>
-                        <button className="v-btn v-btn-green" onClick={requestMicPermission}>🐇 한번 시작하기!</button>
-                    </div>
-                </div>
-            );
+  // done
+  return (
+    <motion.div initial={{scale:0.5, opacity:0}} animate={{scale:1, opacity:1}} className="card p-7 mt-3 text-center">
+      <div className="text-7xl mb-3 pop-correct">🎉</div>
+      <h2 className="font-jua t-h1 text-emerald-600 whitespace-pre-line">{quiz.fb}</h2>
+      <p className="font-gaegu t-lg text-gray-600 mt-3">{place.name}을(를) 다 알았어요!</p>
+      <button onClick={() => onBack({ correct: true, helpUsed })} className="btn w-full mt-5 bg-gradient-to-r from-pink-400 to-purple-500 text-white font-jua t-h2 py-5">
+        지도로 돌아가기 🗺️
+      </button>
+    </motion.div>
+  );
+}
 
-            // Login
-            if (phase === 'login') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
-                    <TopBar />
-                    <RabbitCharacter />
-                    <p className="v-h1" style={{color:'#15803d'}}>학교 사람 탐험대</p>
-                    <p className="v-body" style={{color:'#6b7280'}}>내 이름을 선택하고 시작하세요!</p>
-                    <div className="v-card">
-                        <select className="v-select" value={studentName} onChange={(e) => setStudentName(e.target.value)}>
-                            <option value="">이름을 선택하세요 ▼</option>
-                            {students.map((s, i) => <option key={i} value={s}>{s}</option>)}
-                        </select>
-                        <button className="v-btn v-btn-green" style={{opacity: studentName ? 1 : 0.4}}
-                            onClick={() => { if (studentName) setPhase('intro'); }}>
-                            시작하기 🐇
-                        </button>
-                    </div>
-                </div>
-            );
+/* ════════════════════════════════════════════════════════════
+   활동 2 — 예절 상황 퀴즈
+   ════════════════════════════════════════════════════════════ */
+function MannersActivity({ speakerOn, log, setLog, onDone }) {
+  const [idx, setIdx] = useState(0);
+  const [picked, setPicked] = useState(-1);
+  const [showFb, setShowFb] = useState(false);
+  const [helpUsed, setHelpUsed] = useState(false);
+  const q = MANNERS_Q[idx];
 
-            // Intro
-            if (phase === 'intro') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
-                    <TopBar />
-                    <RabbitCharacter />
-                    <div className="v-card fade-in-scale" style={{textAlign:'center'}}>
-                        <p className="v-h2" style={{color:'#16a34a',marginBottom:'1.5vmin'}}>안녕, {studentName}! 👋</p>
-                        <p className="v-body" style={{color:'#374151',marginBottom:'3vmin'}}>
-                            우리 학교에는 어떤 사람들이 있을까요?<br/>미리 아는 대로 말해보아요!
-                        </p>
-                        <button className="v-btn v-btn-green"
-                            onClick={() => { speak('우리 학교에 어떤 사람들이 있는지 아는 대로 말해보세요.'); setPhase('prerecord'); }}>
-                            사전 녹음하러 가기 🎤
-                        </button>
-                    </div>
-                </div>
-            );
+  // 보기 셔플
+  const shuffled = useMemo(() => {
+    const arr = q.opts.map((t, i) => ({ t, i }));
+    for (let j = arr.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [arr[j], arr[k]] = [arr[k], arr[j]];
+    }
+    return arr;
+  }, [idx]);
 
-            // Pre-Record
-            if (phase === 'prerecord') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
-                    <TopBar />
-                    <div className="v-card" style={{textAlign:'center'}}>
-                        <p className="v-h2" style={{color:'#15803d',marginBottom:'1vmin'}}>학교에는 누가 있을까요?</p>
-                        <p className="v-body" style={{color:'#9ca3af',marginBottom:'2vmin'}}>마이크 버튼을 눌러 말해보세요.</p>
-                        <button className={`v-mic ${isRecording ? 'pulse-record' : ''}`}
-                            style={{background: isRecording ? '#fee2e2' : '#dcfce7', borderColor: isRecording ? '#ef4444' : '#22c55e', color: isRecording ? '#ef4444' : '#22c55e'}}
-                            onClick={isRecording ? null : startRecording} disabled={isRecording}>
-                            🎤
-                        </button>
-                        <p className="v-body" style={{color: isRecording ? '#ef4444' : '#9ca3af', marginTop:'1.5vmin'}}>
-                            {isRecording ? '🔴 녹음 중... (종료 버튼을 눌러주세요)' : '버튼을 눌러 시작'}
-                        </p>
-                        <div className="v-txt-area" style={{marginTop:'2vmin',textAlign:'left'}}>
-                            {preAudioText || <span style={{color:'#d1d5db'}}>말한 내용이 여기에 나타납니다...</span>}
-                        </div>
-                        {isRecording ? (
-                            <button className="v-btn" style={{marginTop:'2vmin', background:'#ef4444', color:'white'}}
-                                onClick={() => { stopRecording(); setPhase('dictionary'); }}>
-                                🛑 녹음 종료 및 출발하기 →
-                            </button>
-                        ) : (
-                            <button className="v-btn v-btn-green" style={{marginTop:'2vmin', opacity: preAudioText ? 1 : 0.4}}
-                                disabled={!preAudioText} onClick={() => setPhase('dictionary')}>
-                                탐험 시작하기 →
-                            </button>
-                        )}
-                    </div>
-                </div>
-            );
+  useEffect(() => { speak(q.situation, speakerOn); setPicked(-1); setShowFb(false); setHelpUsed(false); }, [idx]);
 
-            // Dictionary
-            if (phase === 'dictionary') return (
-                <div className="v-screen" style={{background:'#fffbeb',textAlign:'center',gap:'2vmin'}}>
-                    <TopBar />
-                    <div className="v-card slide-up" style={{textAlign:'center', borderColor:'#fde68a'}}>
-                        <div style={{fontSize:'7vmin'}}>📖</div>
-                        <p className="v-h2" style={{color:'#d97706',margin:'1vmin 0'}}>학교 사람 사전</p>
-                        <p className="v-body" style={{color:'#374151',marginBottom:'3vmin'}}>
-                            우리 학교에는 다양한 역할을 해주시는<br/>고마운 분들이 많이 계셔요!<br/>직접 장소를 돌아다니며 알아볼까요?
-                        </p>
-                        <button className="v-btn v-btn-yellow" onClick={() => setPhase('explore')}>출발하기 🚀</button>
-                    </div>
-                </div>
-            );
+  const pick = (origIdx) => {
+    setPicked(origIdx);
+    const correct = origIdx === q.ans;
+    setShowFb(true);
+    playSound(correct ? 'correct' : 'wrong', speakerOn);
+    speak(correct ? q.fb : '한 번 더 생각해볼까요?', speakerOn);
+    if (correct) {
+      setLog(l => ({...l, mannersQuiz: [...l.mannersQuiz, { qIdx: idx, correct: true, helpUsed }]}));
+      setTimeout(() => {
+        if (idx + 1 >= MANNERS_Q.length) { playSound('finish', speakerOn); onDone(); }
+        else setIdx(idx + 1);
+      }, 2800);
+    } else {
+      setTimeout(() => { setShowFb(false); setPicked(-1); }, 2200);
+    }
+  };
 
-            // 6. Explore Places
-            if (phase === 'explore') {
-                const currentPlace = places[currentPlaceIdx];
-                const allDone = exploredPlaces.length >= places.length;
+  return (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="card p-6 sm:p-8 mt-3">
+      <div className="text-center mb-4">
+        <p className="font-gaegu t-sm text-gray-500">예절 미션 {idx+1} / {MANNERS_Q.length}</p>
+        <div className="text-6xl my-2 hop">{q.icon}</div>
+        <h2 className="font-jua t-h2 text-purple-700 leading-snug">{q.situation}</h2>
+        <button onClick={() => speak(q.situation, true)} className="mt-2 bg-purple-300 rounded-full p-2 inline-block"><Volume2 size={18} className="text-white"/></button>
+      </div>
 
-                const handlePlaceAnswer = (optionIndex) => {
-                    const isCorrect = (optionIndex + 1).toString() === currentPlace['정답(1또는2)'].toString();
-                    if (isCorrect) {
-                        playSound('correct', isMuted);
-                        setFeedback({ type: 'success', text: currentPlace['정답피드백'] });
-                        speak(currentPlace['정답피드백']);
-                        if (!exploredPlaces.includes(currentPlaceIdx)) {
-                            setExploredPlaces([...exploredPlaces, currentPlaceIdx]);
-                        }
+      <div className="space-y-3 mb-4">
+        {shuffled.map(({ t, i }, sIdx) => {
+          const isPicked = picked === i;
+          const isCorrect = i === q.ans;
+          const reveal = showFb && isPicked;
+          return (
+            <motion.button
+              key={i}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              disabled={showFb}
+              onClick={() => pick(i)}
+              className={`w-full text-left rounded-3xl p-5 font-gaegu t-lg border-4 transition-all flex items-center gap-3 ${reveal ? (isCorrect ? 'bg-emerald-100 border-emerald-500' : 'bg-orange-100 border-orange-400') : 'bg-white border-pink-100 hover:border-pink-400'}`}>
+              <span className="inline-block w-9 h-9 rounded-full bg-purple-200 text-purple-700 font-jua text-center leading-9 flex-shrink-0">{String.fromCharCode(65+sIdx)}</span>
+              <span className="flex-1">{t}</span>
+              {reveal && isCorrect && <Check className="text-emerald-600" size={26}/>}
+              {reveal && !isCorrect && <X className="text-orange-500" size={26}/>}
+            </motion.button>
+          );
+        })}
+      </div>
 
-                        // 3초 후 자동 전환
-                        setTimeout(() => {
-                            setFeedback(null);
-                        }, 3000);
+      {showFb && picked === q.ans && (
+        <motion.div initial={{scale:0.5}} animate={{scale:1}} className="bg-emerald-50 rounded-3xl p-4 mb-3 text-center">
+          <p className="font-jua t-lg text-emerald-700 whitespace-pre-line">{q.fb}</p>
+        </motion.div>
+      )}
 
-                    } else {
-                        playSound('wrong', isMuted);
-                        setFeedback({ type: 'error', text: currentPlace['오답피드백'] });
-                        speak(currentPlace['오답피드백']);
-                        if (!wrongPlaces.includes(currentPlace['장소'])) {
-                            setWrongPlaces([...wrongPlaces, currentPlace['장소']]);
-                        }
-                    }
-                };
+      <button onClick={() => { if (!helpUsed) setHelpUsed(true); speak(q.helpText, true); }} className="btn w-full bg-purple-200 text-purple-800 font-jua t-base flex items-center justify-center gap-2">
+        <HelpCircle size={20}/> 💜 도움받기 (이렇게 말해볼까요?)
+      </button>
+      <p className="font-gaegu t-sm text-gray-400 text-center mt-2">💡 위 도움받기 버튼을 누르면 예시 문장을 들려드려요</p>
+    </motion.div>
+  );
+}
 
-                return (
-                    <div className="v-screen" style={{background:'#f0fdf4',justifyContent:'flex-start',paddingTop:'6vmin',position:'relative'}}>
-                        <TopBar />
-                        <p className="v-h2" style={{color:'#15803d',marginBottom:'2vmin'}}>어디로 가볼까요? 🗺️</p>
-                        <div className="v-grid" style={{width:'100%',maxWidth:'90vmin'}}>
-                            {places.map((p,i)=>(
-                                <button key={i} className={`v-place-btn ${exploredPlaces.includes(i)?'done':''}`}
-                                    onClick={()=>{setCurrentPlaceIdx(i);setFeedback(null);speak(p['질문']);}}>
-                                    <span className="v-place-emoji">{p['이모지']}</span>
-                                    <span>{exploredPlaces.includes(i)?'✅ ':''}{p['장소']}</span>
-                                </button>
-                            ))}
-                        </div>
-                        {allDone && (
-                            <button className="v-btn v-btn-green fade-in-scale" style={{marginTop:'2vmin',maxWidth:'80vmin'}}
-                                onClick={()=>setPhase('etiquette')}>다음 활동으로 →</button>
-                        )}
-                        {currentPlace && !feedback && !allDone && !exploredPlaces.includes(currentPlaceIdx) && (
-                            <div className="v-overlay">
-                                <div className="v-popup pop-in" style={{border:'0.4vmin solid #86efac', textAlign:'center'}}>
-                                    <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'1.5vmin',marginBottom:'1.5vmin'}}>
-                                        <span style={{fontSize:'6vmin'}}>{currentPlace['이모지']}</span>
-                                        <p className="v-h3" style={{color:'#1f2937'}}>{currentPlace['장소']}</p>
-                                    </div>
-                                    <p className="v-body" style={{color:'#4b5563',marginBottom:'3vmin',fontWeight:700}}>{currentPlace['질문']}</p>
-                                    <div style={{display:'flex',flexDirection:'column',gap:'1.5vmin'}}>
-                                        <button className="v-btn v-btn-gray" style={{textAlign:'center'}} onClick={()=>handlePlaceAnswer(0)}>{currentPlace['선택지1']}</button>
-                                        <button className="v-btn v-btn-gray" style={{textAlign:'center'}} onClick={()=>handlePlaceAnswer(1)}>{currentPlace['선택지2']}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {feedback && (
-                            <div className="v-overlay">
-                                <div className="v-popup pop-in" style={{border:`0.5vmin solid ${feedback.type==='success'?'#22c55e':'#ef4444'}`}}>
-                                    <div style={{fontSize:'8vmin'}}>{feedback.type==='success'?'🎉':'🤔'}</div>
-                                    <p className="v-h3" style={{color:feedback.type==='success'?'#16a34a':'#dc2626',margin:'1.5vmin 0'}}>{feedback.text}</p>
-                                    {feedback.type==='success'
-                                        ?<p className="v-body" style={{color:'#9ca3af'}}>잠시 후 자동으로 넘어갑니다...</p>
-                                        :<button className="v-btn" style={{background:'#ef4444',color:'white',marginTop:'1.5vmin'}} onClick={()=>setFeedback(null)}>다시 풀기</button>}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                );
-            }
+/* ════════════════════════════════════════════════════════════
+   활동 3 — 사람-장소 매칭 (드래그앤드롭)
+   ════════════════════════════════════════════════════════════ */
+function MatchingActivity({ speakerOn, onDone }) {
+  const pairs = [
+    { person: '사서 선생님', emoji: '📖', placeId: 'library', placeName: '도서관' },
+    { person: '영양사 선생님', emoji: '🥗', placeId: 'cafeteria', placeName: '급식실' },
+    { person: '보건 선생님', emoji: '👩‍⚕️', placeId: 'health', placeName: '보건실' },
+    { person: '교장 선생님', emoji: '👨‍💼', placeId: 'principal', placeName: '교장실' },
+    { person: '행정실무사님', emoji: '🧑‍💼', placeId: 'admin', placeName: '행정실' },
+  ];
+  const [matched, setMatched] = useState({}); // {placeId: personIdx}
+  const [dragging, setDragging] = useState(null);
+  const [hoverPlace, setHoverPlace] = useState(null);
+  const [wrongFlash, setWrongFlash] = useState(null);
 
-            // Etiquette
-            if (phase === 'etiquette') {
-                const currentQ = etiquette[currentEtiquetteIdx];
-                if (!currentQ) return <div className="v-screen"/>;
-                const handleEtiquetteAnswer = (idx) => {
-                    const ok = (idx+1).toString() === currentQ['정답(1또는2)'].toString();
-                    if (ok) {
-                        playSound('correct',isMuted); speak(currentQ['정답피드백']);
-                        setFeedback({type:'success',text:currentQ['정답피드백']});
-                        setTimeout(()=>{
-                            setFeedback(null);
-                            if (currentEtiquetteIdx < etiquette.length-1) setCurrentEtiquetteIdx(currentEtiquetteIdx+1);
-                            else setPhase('postrecord');
-                        },3000);
-                    } else {
-                        playSound('wrong',isMuted); speak(currentQ['오답피드백']);
-                        setFeedback({type:'error',text:currentQ['오답피드백']});
-                        if (!wrongEtiquette.includes(currentQ['ID'])) setWrongEtiquette([...wrongEtiquette,currentQ['ID']]);
-                    }
-                };
-                return (
-                    <div className="v-screen" style={{background:'#f0fdf4',gap:'2vmin',position:'relative'}}>
-                        <TopBar />
-                        <div style={{width:'100%',maxWidth:'80vmin'}}>
-                            <div style={{display:'flex',justifyContent:'space-between',marginBottom:'1vmin'}}>
-                                <span className="v-body" style={{color:'#15803d',fontWeight:700}}>상황별 예절 퀴즈</span>
-                                <span className="v-body" style={{color:'#9ca3af'}}>{currentEtiquetteIdx+1} / {etiquette.length}</span>
-                            </div>
-                            <div className="v-progress"><div className="v-progress-fill" style={{width:`${(currentEtiquetteIdx/etiquette.length)*100}%`}}/></div>
-                        </div>
-                        <div className="v-card">
-                            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:'2vmin'}}>
-                                <p className="v-h3" style={{color:'#1f2937',flex:1,paddingRight:'2vmin'}}>{currentQ['시나리오']}</p>
-                                <button onClick={()=>speak(currentQ['시나리오'])} style={{fontSize:'3.5vmin',background:'#f0fdf4',border:'none',borderRadius:'50%',padding:'1vmin',cursor:'pointer'}}>🔊</button>
-                            </div>
-                            <div style={{display:'flex',flexDirection:'column',gap:'1.5vmin'}}>
-                                <button className="v-btn v-btn-gray" style={{textAlign:'left'}} onClick={()=>handleEtiquetteAnswer(0)}>{currentQ['선택지1']}</button>
-                                <button className="v-btn v-btn-gray" style={{textAlign:'left'}} onClick={()=>handleEtiquetteAnswer(1)}>{currentQ['선택지2']}</button>
-                            </div>
-                        </div>
-                        {feedback && (
-                            <div className="v-overlay">
-                                <div className="v-popup pop-in" style={{border:`0.5vmin solid ${feedback.type==='success'?'#22c55e':'#ef4444'}`}}>
-                                    <div style={{fontSize:'8vmin'}}>{feedback.type==='success'?'✨':'😅'}</div>
-                                    <p className="v-h3" style={{color:feedback.type==='success'?'#16a34a':'#dc2626',margin:'1.5vmin 0'}}>{feedback.text}</p>
-                                    {feedback.type==='success'
-                                        ?<p className="v-body" style={{color:'#9ca3af'}}>잠시 후 자동으로 넘어갑니다...</p>
-                                        :<button className="v-btn" style={{background:'#ef4444',color:'white',marginTop:'1.5vmin'}} onClick={()=>setFeedback(null)}>다시 풀기</button>}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                );
-            }
+  // 인물 카드 셔플
+  const shuffledPersons = useMemo(() => {
+    const arr = pairs.map((p, i) => ({ ...p, idx: i }));
+    for (let j = arr.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [arr[j], arr[k]] = [arr[k], arr[j]];
+    }
+    return arr;
+  }, []);
 
-            // Post-Record
-            if (phase === 'postrecord') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
-                    <TopBar />
-                    <div className="v-card" style={{textAlign:'center'}}>
-                        <p className="v-h2" style={{color:'#15803d',marginBottom:'1vmin'}}>학습을 마쳤어요! 🎊</p>
-                        <p className="v-body" style={{color:'#9ca3af',marginBottom:'2vmin'}}>학교 사람들을 다시 한번 말해볼까요?</p>
-                        <button className={`v-mic ${isRecording?'pulse-record':''}`}
-                            style={{background:isRecording?'#fee2e2':'#dcfce7',borderColor:isRecording?'#ef4444':'#22c55e',color:isRecording?'#ef4444':'#22c55e'}}
-                            onClick={isRecording ? null : startRecording} disabled={isRecording}>🎤</button>
-                        <p className="v-body" style={{color:isRecording?'#ef4444':'#9ca3af',marginTop:'1.5vmin'}}>
-                            {isRecording ? '🔴 녹음 중... (종료 버튼을 눌러주세요)' : '버튼을 눌러 시작'}
-                        </p>
-                        <div className="v-txt-area" style={{marginTop:'2vmin',textAlign:'left'}}>
-                            {postAudioText||<span style={{color:'#d1d5db'}}>말한 내용이 여기에 나타납니다...</span>}
-                        </div>
-                        {isRecording ? (
-                            <button className="v-btn" style={{marginTop:'2vmin', background:'#ef4444', color:'white'}}
-                                onClick={() => { stopRecording(); setPhase('eval'); }}>
-                                🛑 녹음 종료 및 평가하러 가기 →
-                            </button>
-                        ) : (
-                            <button className="v-btn v-btn-green" style={{marginTop:'2vmin', opacity: postAudioText ? 1 : 0.4}}
-                                disabled={!postAudioText} onClick={() => setPhase('eval')}>
-                                평가하러 가기 →
-                            </button>
-                        )}
-                    </div>
-                </div>
-            );
+  const shuffledPlaces = useMemo(() => {
+    const arr = pairs.map((p, i) => ({ ...p, idx: i }));
+    for (let j = arr.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [arr[j], arr[k]] = [arr[k], arr[j]];
+    }
+    return arr;
+  }, []);
 
-            // Eval
-            if (phase === 'eval') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin',position:'relative'}}>
-                    {isLoading && (
-                        <div style={{position:'absolute',inset:0,background:'rgba(255,255,255,0.85)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',zIndex:60}}>
-                            <div className="spin" style={{fontSize:'5vmin'}}>⏳</div>
-                            <p className="v-body" style={{color:'#15803d',marginTop:'1vmin'}}>{loadingMsg}</p>
-                        </div>
-                    )}
-                    <TopBar />
-                    <div className="v-card" style={{textAlign:'center'}}>
-                        <p className="v-h2" style={{color:'#1f2937',marginBottom:'1vmin'}}>스스로 평가해 보아요 ⭐</p>
-                        <p className="v-body" style={{color:'#9ca3af',marginBottom:'2vmin'}}>오늘 학습에 얼마나 열심히 참여했나요?</p>
-                        <div style={{display:'flex',justifyContent:'center',gap:'1vmin',marginBottom:'2vmin'}}>
-                            {[1,2,3,4,5].map(s=>(
-                                <button key={s} className="v-star" onClick={()=>handleStarClick(s)}>
-                                    {s<=stars?'⭐':'☆'}
-                                </button>
-                            ))}
-                        </div>
-                        {stars>0 && stars<=3 && (
-                            <div className="slide-up" style={{background:'#fff7ed',border:'0.4vmin solid #fdba74',borderRadius:'2vmin',padding:'2vmin'}}>
-                                <p className="v-body" style={{color:'#c2410c',fontWeight:700,marginBottom:'1.5vmin'}}>조금 더 알아보고 싶나요?</p>
-                                <button className="v-btn" style={{background:'#f97316',color:'white',marginBottom:'1vmin'}}
-                                    onClick={()=>{setStars(0);setCurrentPlaceIdx(0);setExploredPlaces([]);setCurrentEtiquetteIdx(0);setWrongPlaces([]);setWrongEtiquette([]);setPhase('explore');}}>
-                                    다시 활동하기 🔄
-                                </button>
-                                <button className="v-btn v-btn-gray" onClick={()=>submitResults(stars)}>아니요, 마칠래요</button>
-                            </div>
-                        )}
-                        {stars>3 && <p className="v-body" style={{color:'#16a34a',fontWeight:700}}>정말 훌륭해요! 잠시 기다려주세요... ✨</p>}
-                    </div>
-                </div>
-            );
+  useEffect(() => { speak('사람을 알맞은 장소로 옮겨주세요!', speakerOn); }, []);
 
-            // Reward
-            if (phase === 'reward') return (
-                <div className="v-screen" style={{background:'#f0fdf4',textAlign:'center',gap:'2vmin'}}>
-                    <TopBar />
-                    <div className="v-card fade-in-scale" style={{textAlign:'center',border:'0.5vmin double #86efac'}}>
-                        <div style={{fontSize:'9vmin'}}>🏆</div>
-                        <p className="v-h1" style={{color:'#15803d',margin:'1vmin 0'}}>예절 박사 수료증</p>
-                        <p className="v-body" style={{color:'#6b7280',marginBottom:'2vmin'}}>우리 학교 사람들을 알아보고<br/>따뜻한 마음을 나누었어요!</p>
-                        <div style={{background:'#f0fdf4',borderRadius:'2vmin',padding:'2vmin',border:'0.4vmin dashed #86efac',textAlign:'left',marginBottom:'2vmin'}}>
-                            <p className="v-body" style={{fontWeight:700,color:'#374151'}}>이름: {studentName}</p>
-                            <p className="v-body" style={{fontWeight:700,color:'#374151'}}>별점: {'⭐'.repeat(stars)}</p>
-                        </div>
-                        <button className="v-btn v-btn-green" onClick={()=>window.location.reload()}>처음으로 돌아가기 🏠</button>
-                    </div>
-                </div>
-            );
+  const onDrop = (placeIdx) => {
+    if (dragging === null) return;
+    const person = pairs[dragging];
+    const place = pairs[placeIdx];
+    if (person.placeId === place.placeId) {
+      // 정답
+      setMatched(m => ({...m, [place.placeId]: dragging }));
+      playSound('correct', speakerOn);
+      speak('맞아요!', speakerOn);
+    } else {
+      // 오답 — 살짝 흔들기
+      setWrongFlash(placeIdx);
+      playSound('wrong', speakerOn);
+      speak('한 번 더 생각해볼까요?', speakerOn);
+      setTimeout(() => setWrongFlash(null), 600);
+    }
+    setDragging(null);
+    setHoverPlace(null);
+  };
 
-            return null;
+  const allDone = Object.keys(matched).length === pairs.length;
+  useEffect(() => {
+    if (allDone) { playSound('finish', speakerOn); }
+  }, [allDone]);
 
-        };
+  return (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="card p-6 sm:p-8 mt-3">
+      <div className="text-center mb-4">
+        <h2 className="font-jua t-h1 text-pink-600">🧩 사람-장소 짝짓기</h2>
+        <p className="font-gaegu t-lg text-purple-700 mt-2">사람 카드를 알맞은 장소로 끌어다 놓으세요!</p>
+        <p className="font-gaegu t-sm text-gray-500 mt-1">({Object.keys(matched).length} / {pairs.length})</p>
+      </div>
 
-        const Root = () => <App />;
+      {/* 인물 카드들 */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
+        {shuffledPersons.map(p => {
+          const placed = Object.values(matched).includes(p.idx);
+          return (
+            <div
+              key={p.idx}
+              draggable={!placed}
+              onDragStart={() => setDragging(p.idx)}
+              onDragEnd={() => setDragging(null)}
+              onTouchStart={() => setDragging(p.idx)}
+              className={`drag-card rounded-3xl p-3 text-center font-jua t-sm border-4 ${placed ? 'bg-emerald-100 border-emerald-400 opacity-60' : 'bg-yellow-50 border-yellow-300'}`}>
+              <div className="text-4xl">{p.emoji}</div>
+              <div className="mt-1 text-gray-800">{p.person}</div>
+              {placed && <Check className="text-emerald-600 mx-auto mt-1" size={18}/>}
+            </div>
+          );
+        })}
+      </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<Root />);
-    </script>
+      <div className="font-gaegu t-sm text-purple-600 text-center mb-2">👇 여기로 옮겨주세요</div>
+
+      {/* 장소 박스들 */}
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
+        {shuffledPlaces.map(p => {
+          const matchedPersonIdx = matched[p.placeId];
+          const placeData = PLACES.find(x => x.id === p.placeId);
+          return (
+            <div
+              key={p.idx}
+              onDragOver={e => { e.preventDefault(); setHoverPlace(p.idx); }}
+              onDragLeave={() => setHoverPlace(null)}
+              onDrop={() => onDrop(p.idx)}
+              onClick={() => { if (dragging !== null) onDrop(p.idx); }}
+              className={`rounded-3xl p-3 text-center font-jua t-sm border-4 border-dashed min-h-[120px] flex flex-col items-center justify-center transition-all ${matchedPersonIdx !== undefined ? 'bg-emerald-100 border-emerald-500' : hoverPlace === p.idx ? 'drop-zone-active border-purple-500' : 'bg-purple-50 border-purple-200'} ${wrongFlash === p.idx ? 'animate-pulse border-orange-500' : ''}`}>
+              <div className="text-3xl">{placeData.emoji}</div>
+              <div className="t-sm text-gray-800 mt-1">{p.placeName}</div>
+              {matchedPersonIdx !== undefined && (
+                <div className="text-2xl mt-1">{pairs[matchedPersonIdx].emoji}</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="font-gaegu t-sm text-gray-500 text-center mb-3">💡 모바일에서는 카드를 살짝 누른 뒤 장소를 눌러도 돼요</p>
+
+      <button disabled={!allDone} onClick={onDone} className={`btn w-full font-jua t-h2 py-5 ${allDone ? 'bg-gradient-to-r from-pink-400 to-purple-500 text-white pulse-glow' : 'bg-gray-200 text-gray-400'}`}>
+        {allDone ? '🎉 모두 짝지었어요! →' : '모든 카드를 짝지어 보세요'}
+      </button>
+    </motion.div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   배움 정리·성찰 단계
+   ════════════════════════════════════════════════════════════ */
+function Reflection({ speakerOn, onDone }) {
+  const [text, setText] = useState('');
+  const prompts = [
+    '오늘 가장 기억에 남는 분은 누구였나요?',
+    '예절 중에 새로 알게 된 것이 있나요?',
+    '내일 학교에서 꼭 실천할 한 가지는?',
+  ];
+  const [selected, setSelected] = useState([]);
+
+  useEffect(() => { speak('오늘 배운 것을 잠시 돌아볼까요?', speakerOn); }, []);
+
+  const toggle = (s) => {
+    setSelected(arr => arr.includes(s) ? arr.filter(x => x !== s) : [...arr, s]);
+  };
+
+  return (
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} exit={{opacity:0}} className="card p-6 sm:p-8 mt-3">
+      <div className="text-center mb-4">
+        <div className="text-6xl float mb-2">💭</div>
+        <h2 className="font-jua t-h1 text-purple-600">잠깐, 돌아보기</h2>
+        <p className="font-gaegu t-lg text-pink-600 mt-2">오늘 활동을 천천히 떠올려봐요</p>
+      </div>
+
+      <div className="bg-yellow-50 rounded-3xl p-4 mb-4">
+        <p className="font-jua t-md text-amber-800 mb-2">📌 오늘 배운 것 (눌러서 선택해요)</p>
+        <div className="grid grid-cols-2 gap-2">
+          {['🏥 보건실엔 보건 선생님', '📚 도서관엔 사서 선생님', '🍱 급식실 영양사·조리사님', '🗃️ 행정실무사님이 학교 살림', '🙇 만나면 먼저 인사하기', '🤫 도서관은 소곤소곤', '✋ 수업 중엔 손 들고 말하기', '🙏 잘 먹겠습니다 감사 인사'].map(s => (
+            <button key={s} onClick={() => toggle(s)} className={`rounded-2xl p-3 font-gaegu t-sm text-left ${selected.includes(s) ? 'bg-emerald-200 ring-2 ring-emerald-500' : 'bg-white'}`}>
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-3">
+        <p className="font-jua t-md text-purple-700 mb-2">✍️ 내 생각 적어보기 (선택)</p>
+        <textarea
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="오늘 배운 것 중 하나 더 적어볼까요?"
+          className="w-full font-gaegu t-md p-4 rounded-3xl border-4 border-purple-200 min-h-[80px] focus:border-purple-500 focus:outline-none"
+        />
+      </div>
+
+      <button onClick={() => onDone(text + (selected.length ? ` | 선택: ${selected.join(', ')}` : ''))} className="btn w-full bg-gradient-to-r from-emerald-400 to-green-500 text-white font-jua t-h2 py-5 pulse-glow">
+        다 했어요! 마지막 다짐으로 → 🌟
+      </button>
+    </motion.div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   수료증 화면 — 결과 제출 + 폭죽
+   ════════════════════════════════════════════════════════════ */
+function Certificate({ student, log, speakerOn, onRestart }) {
+  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [confetti, setConfetti] = useState([]);
+
+  useEffect(() => {
+    // 폭죽
+    const items = ['🎉','🎊','⭐','💖','🌸','🌟','🎀','✨'];
+    const arr = Array.from({length: 30}, (_, i) => ({
+      id: i,
+      emoji: items[Math.floor(Math.random()*items.length)],
+      left: Math.random()*100,
+      delay: Math.random()*3,
+      duration: 3 + Math.random()*2,
+    }));
+    setConfetti(arr);
+    speak('수료증을 받았어요! 정말 멋진 탐험이었어요!', speakerOn);
+    playSound('finish', speakerOn);
+
+    // 자동 제출 (GAS 연결 시)
+    submitToSheet();
+  }, []);
+
+  const submitToSheet = async () => {
+    if (!GAS_API_URL || submitted) return;
+    setSubmitting(true);
+    try {
+      // 녹음 blob을 base64로 변환
+      const blobToBase64 = (blob) => new Promise((res, rej) => {
+        if (!blob) return res('');
+        const r = new FileReader();
+        r.onloadend = () => res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(blob);
+      });
+      const preB64 = await blobToBase64(log.preRecord?.audioBlob);
+      const postB64 = await blobToBase64(log.postRecord?.audioBlob);
+
+      const payload = {
+        action: 'submit',
+        student,
+        startedAt: log.startedAt,
+        finishedAt: new Date().toISOString(),
+        preTranscript: log.preRecord?.transcript || '',
+        postTranscript: log.postRecord?.transcript || '',
+        preAudio: preB64,
+        postAudio: postB64,
+        placesVisited: log.placesVisited.join(','),
+        peopleQuizScore: log.peopleQuiz.filter(x=>x.correct).length,
+        peopleQuizHelpCount: log.peopleQuiz.filter(x=>x.helpUsed).length,
+        mannersScore: log.mannersQuiz.filter(x=>x.correct).length,
+        mannersHelpCount: log.mannersQuiz.filter(x=>x.helpUsed).length,
+        matchingDone: log.matchingDone,
+        selfStars: log.selfStars,
+        stickers: log.stickers.join(''),
+        reflection: log.reflection,
+        helpUsedAny: log.preRecord?.helpUsed || log.postRecord?.helpUsed || log.peopleQuiz.some(x=>x.helpUsed) || log.mannersQuiz.some(x=>x.helpUsed),
+      };
+      const r = await fetch(GAS_API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      });
+      setSubmitted(true);
+    } catch (e) {
+      console.warn('제출 실패:', e);
+    }
+    setSubmitting(false);
+  };
+
+  const peopleScore = log.peopleQuiz.filter(x=>x.correct).length;
+  const mannersScore = log.mannersQuiz.filter(x=>x.correct).length;
+
+  return (
+    <>
+      {/* 폭죽 */}
+      {confetti.map(c => (
+        <div key={c.id} className="confetti" style={{left:`${c.left}%`, animationDelay:`${c.delay}s`, animationDuration:`${c.duration}s`}}>
+          {c.emoji}
+        </div>
+      ))}
+
+      <motion.div initial={{opacity:0, scale:0.9}} animate={{opacity:1, scale:1}} exit={{opacity:0}} className="cert-frame p-6 sm:p-10 rounded-3xl mt-3 relative">
+        <div className="text-center">
+          <p className="font-jua t-md text-amber-700 mb-2">🎖️ 수 료 증 🎖️</p>
+          <h1 className="font-jua t-hero text-amber-900 mb-2">학교 사람 탐험대</h1>
+          <div className="border-t-4 border-b-4 border-dashed border-amber-500 py-4 my-4">
+            <p className="font-gaegu t-h2 text-amber-800">{student}</p>
+            <p className="font-do t-md text-amber-700 mt-2">위 친구는 학교에서 일하시는 분들과<br/>예절을 지키며 생활하는 방법을 알아내었기에<br/>이 수료증을 드립니다.</p>
+          </div>
+
+          {/* 결과 요약 */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div className="bg-white rounded-2xl p-3 border-2 border-amber-300">
+              <div className="text-3xl">🗺️</div>
+              <div className="font-jua t-sm text-amber-800">탐험한 장소</div>
+              <div className="font-jua t-h2 text-amber-900">{log.placesVisited.length}</div>
+            </div>
+            <div className="bg-white rounded-2xl p-3 border-2 border-pink-300">
+              <div className="text-3xl">👥</div>
+              <div className="font-jua t-sm text-pink-800">사람 도감</div>
+              <div className="font-jua t-h2 text-pink-900">{peopleScore}/{PLACES.length}</div>
+            </div>
+            <div className="bg-white rounded-2xl p-3 border-2 border-purple-300">
+              <div className="text-3xl">🤝</div>
+              <div className="font-jua t-sm text-purple-800">예절 미션</div>
+              <div className="font-jua t-h2 text-purple-900">{mannersScore}/{MANNERS_Q.length}</div>
+            </div>
+            <div className="bg-white rounded-2xl p-3 border-2 border-emerald-300">
+              <div className="text-3xl">⭐</div>
+              <div className="font-jua t-sm text-emerald-800">내 다짐</div>
+              <div className="font-jua t-h2 text-emerald-900">{'⭐'.repeat(log.selfStars)}</div>
+            </div>
+          </div>
+
+          {/* 모은 스티커 */}
+          {log.stickers.length > 0 && (
+            <div className="bg-white rounded-2xl p-3 mb-4 border-2 border-amber-300">
+              <div className="font-jua t-sm text-amber-800 mb-2">🎁 모은 칭찬 스티커</div>
+              <div className="text-4xl">{log.stickers.join(' ')}</div>
+            </div>
+          )}
+
+          {/* 도장 */}
+          <div className="flex justify-center my-4">
+            <div className="cert-stamp w-24 h-24 rounded-full flex items-center justify-center font-jua transform rotate-12">
+              <span className="t-md">참! 잘했어요</span>
+            </div>
+          </div>
+
+          <p className="font-do t-sm text-amber-600">{new Date().toLocaleDateString('ko-KR')}</p>
+          <p className="font-jua t-md text-amber-800 mt-1">🐰 토끼 선생님</p>
+
+          {submitting && <p className="font-gaegu t-sm text-blue-600 mt-3">📡 결과를 선생님께 전송중...</p>}
+          {submitted && <p className="font-gaegu t-sm text-emerald-600 mt-3">✅ 선생님께 잘 전달됐어요!</p>}
+          {!GAS_API_URL && <p className="font-gaegu t-sm text-gray-400 mt-3">💡 (시트 연결 안 됨 — 데모 모드)</p>}
+        </div>
+
+        <button onClick={onRestart} className="btn w-full mt-6 bg-gradient-to-r from-pink-400 to-purple-500 text-white font-jua t-h2 py-5">
+          🐰 새 친구가 시작하기 →
+        </button>
+      </motion.div>
+    </>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════
+   렌더
+   ════════════════════════════════════════════════════════════ */
+const root = createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
 </body>
-
 </html>
