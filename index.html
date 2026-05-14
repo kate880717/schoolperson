@@ -19,12 +19,13 @@
 </script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Do+Hyeon&family=Gowun+Dodum&family=Hi+Melody&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@700;800&family=Do+Hyeon&display=swap');
 
 * { -webkit-tap-highlight-color: transparent; }
 html, body, #root { height: 100%; margin: 0; }
 body {
-  font-family: 'Jua', 'Gowun Dodum', sans-serif;
+  font-family: 'Nanum Gothic', 'Jua', sans-serif;
+  font-weight: 800;
   background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #ddd6fe 100%);
   min-height: 100vh;
   overflow-x: hidden;
@@ -44,10 +45,11 @@ body {
   max-width: 960px;
 }
 
-/* 폰트 */
+/* 폰트 — Gaegu(손글씨) 제거, Nanum Gothic ExtraBold + Jua 조합 */
 .font-jua { font-family: 'Jua', sans-serif; }
-.font-gaegu { font-family: 'Gaegu', sans-serif; }
-.font-hi { font-family: 'Hi Melody', cursive; }
+.font-gaegu { font-family: 'Nanum Gothic', sans-serif; font-weight: 800; }
+.font-nanum { font-family: 'Nanum Gothic', sans-serif; font-weight: 800; }
+.font-hi { font-family: 'Nanum Gothic', sans-serif; font-weight: 800; }
 .font-do { font-family: 'Do Hyeon', sans-serif; }
 
 /* 타입 스케일 (저학년 친화) */
@@ -543,6 +545,7 @@ function Boot() {
    ════════════════════════════════════════════════════════════ */
 function Intro({ onNext, speakerOn, setSpeakerOn, micGranted, setMicGranted }) {
   const [asking, setAsking] = useState(false);
+  const [showTodo, setShowTodo] = useState(false);
 
   const askMic = async () => {
     setAsking(true);
@@ -553,67 +556,73 @@ function Intro({ onNext, speakerOn, setSpeakerOn, micGranted, setMicGranted }) {
     } catch (e) {
       setMicGranted(false);
       alert('마이크를 사용할 수 없어요. 키보드로 입력하셔도 활동을 끝까지 할 수 있어요!');
-      // 마이크 거부해도 진행 가능 (키보드 입력 대체)
     }
     setAsking(false);
   };
 
   return (
-    <motion.div key="intro" initial={{opacity:0, scale:0.96}} animate={{opacity:1, scale:1}} exit={{opacity:0}} className="card p-7 sm:p-10 mt-3">
-      <div className="text-center mb-6">
-        <div className="hop inline-block"><Rabbit size={170}/></div>
-        <h1 className="font-jua t-hero text-pink-600 mt-3">학교 사람 탐험대</h1>
-        <p className="font-gaegu t-h2 text-purple-700 mt-2">🐰 토끼와 함께 학교 사람들을 만나봐요!</p>
-        <p className="font-do t-md text-gray-500 mt-1">통합교과 1~2학년군 · 사람알기 · 예절</p>
+    <motion.div key="intro" initial={{opacity:0, scale:0.96}} animate={{opacity:1, scale:1}} exit={{opacity:0}} className="card p-6 sm:p-8 mt-3">
+      {/* 헤더 — 컴팩트 */}
+      <div className="text-center mb-5">
+        <div className="hop inline-block"><Rabbit size={130}/></div>
+        <h1 className="font-jua t-hero text-pink-600 mt-2">학교 사람 탐험대</h1>
+        <p className="font-nanum t-md text-purple-700 mt-1">🐰 토끼와 함께 학교 사람들을 만나봐요!</p>
       </div>
 
-      {/* 단계별 안내 */}
-      <div className="bg-yellow-50 rounded-3xl p-5 mb-5">
-        <p className="font-jua t-lg text-amber-800 mb-3">📍 오늘 할 일</p>
-        <div className="space-y-2 font-gaegu t-md text-gray-700">
-          <div>1️⃣ 학교 사람 도감 탐험 (어떤 분이 계실까?)</div>
-          <div>2️⃣ 예절 상황 미션 (이럴 땐 어떻게?)</div>
-          <div>3️⃣ 사람-장소 짝짓기 놀이</div>
-          <div>4️⃣ 다짐 녹음 + 칭찬 스티커</div>
-        </div>
-      </div>
-
-      {/* 시작 전 준비 */}
-      <div className="space-y-3">
-        <div className="bg-blue-50 rounded-3xl p-5">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <p className="font-jua t-md text-blue-800">🎤 마이크 준비</p>
-              <p className="font-gaegu t-sm text-gray-600">앱 시작할 때 한 번만 허용하면 돼요</p>
-            </div>
-            {micGranted ? (
-              <span className="bg-emerald-500 text-white rounded-2xl px-4 py-2 font-jua t-base flex items-center gap-1"><Check size={20}/> 사용 가능</span>
-            ) : (
-              <button onClick={askMic} disabled={asking} className="btn bg-blue-500 text-white font-jua t-base">
-                {asking ? '확인중...' : '마이크 허용하기'}
-              </button>
-            )}
-          </div>
-          <p className="font-gaegu t-sm text-gray-500 mt-2">💡 마이크가 없거나 막혀도, 키보드로 입력해서 활동할 수 있어요!</p>
-        </div>
-
-        <div className="bg-green-50 rounded-3xl p-5">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <p className="font-jua t-md text-green-800">🔊 소리 설정</p>
-              <p className="font-gaegu t-sm text-gray-600">켜면 문제를 읽어주고 효과음도 나와요</p>
-            </div>
-            <button onClick={() => setSpeakerOn(v => !v)} className={`btn font-jua t-base flex items-center gap-2 ${speakerOn ? 'speaker-on' : 'speaker-off'}`}>
-              {speakerOn ? <Volume2 size={22}/> : <VolumeX size={22}/>}
-              {speakerOn ? '켜짐' : '꺼짐'}
+      {/* 준비 — 마이크 + 소리 2열 컴팩트 */}
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="bg-blue-50 rounded-3xl p-4 text-center">
+          <p className="font-jua t-md text-blue-800 mb-2">🎤 마이크</p>
+          {micGranted ? (
+            <span className="bg-emerald-500 text-white rounded-2xl px-3 py-2 font-jua t-sm inline-flex items-center gap-1"><Check size={18}/> 사용 가능</span>
+          ) : (
+            <button onClick={askMic} disabled={asking} className="btn bg-blue-500 text-white font-jua t-sm w-full py-3">
+              {asking ? '확인중...' : '허용하기'}
             </button>
-          </div>
+          )}
+        </div>
+        <div className="bg-green-50 rounded-3xl p-4 text-center">
+          <p className="font-jua t-md text-green-800 mb-2">🔊 소리</p>
+          <button onClick={() => setSpeakerOn(v => !v)} className={`btn font-jua t-sm w-full py-3 flex items-center justify-center gap-1 ${speakerOn ? 'speaker-on' : 'speaker-off'}`}>
+            {speakerOn ? <Volume2 size={18}/> : <VolumeX size={18}/>}
+            {speakerOn ? '켜짐' : '꺼짐'}
+          </button>
         </div>
       </div>
+      <p className="font-nanum t-sm text-gray-500 text-center mb-4">💡 마이크가 없어도 키보드로 활동할 수 있어요</p>
 
-      <button onClick={onNext} className="btn w-full mt-6 bg-gradient-to-r from-pink-400 to-purple-500 text-white font-jua t-h2 py-5 pulse-glow">
+      {/* 오늘 할 일 — 팝업 버튼 */}
+      <button onClick={() => setShowTodo(true)} className="btn w-full bg-yellow-100 text-amber-800 font-jua t-md mb-3 py-3 flex items-center justify-center gap-2">
+        📋 오늘 할 일 보기
+      </button>
+
+      {/* 출발 */}
+      <button onClick={onNext} className="btn w-full bg-gradient-to-r from-pink-400 to-purple-500 text-white font-jua t-h1 py-5 pulse-glow">
         🐰 토끼와 함께 출발! →
       </button>
+
+      {/* 오늘 할 일 팝업 */}
+      <AnimatePresence>
+        {showTodo && (
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+            className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-5"
+            onClick={() => setShowTodo(false)}>
+            <motion.div initial={{scale:0.7, y:30}} animate={{scale:1, y:0}} exit={{scale:0.7, opacity:0}}
+              className="card p-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
+              <h2 className="font-jua t-h1 text-amber-700 text-center mb-4">📋 오늘 할 일</h2>
+              <div className="space-y-2">
+                <div className="bg-yellow-50 rounded-2xl p-3 flex items-center gap-3 font-nanum t-md text-gray-700"><span className="text-3xl">1️⃣</span> 학교 사람 도감 탐험</div>
+                <div className="bg-pink-50 rounded-2xl p-3 flex items-center gap-3 font-nanum t-md text-gray-700"><span className="text-3xl">2️⃣</span> 예절 상황 미션</div>
+                <div className="bg-purple-50 rounded-2xl p-3 flex items-center gap-3 font-nanum t-md text-gray-700"><span className="text-3xl">3️⃣</span> 사람-장소 짝짓기</div>
+                <div className="bg-emerald-50 rounded-2xl p-3 flex items-center gap-3 font-nanum t-md text-gray-700"><span className="text-3xl">4️⃣</span> 다짐 녹음 + 칭찬 스티커</div>
+              </div>
+              <button onClick={() => setShowTodo(false)} className="btn w-full mt-5 bg-purple-400 text-white font-jua t-md py-3">
+                알겠어요!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
